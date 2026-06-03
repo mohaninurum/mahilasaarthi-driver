@@ -1,0 +1,7 @@
+flutter_application_id:
+  android:
+    id: "com.mahilasaarthi.delivery"
+    name: "Mahila Delivery"
+  ios:
+    id: "com.mahilasaarthi.delivery"
+    name: "Mahila Delivery"

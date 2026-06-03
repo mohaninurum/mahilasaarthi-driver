@@ -1,0 +1,178 @@
+{
+  "project_info": {
+    "project_number": "697070209321",
+    "firebase_url": "https://mahilasaarthi-2f8dd-default-rtdb.firebaseio.com",
+    "project_id": "mahilasaarthi-2f8dd",
+    "storage_bucket": "mahilasaarthi-2f8dd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697070209321:android:ef23b45068d8d3b265cf38",
+        "android_client_info": {
+          "package_name": "com.mahilasaarthi.customer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "697070209321-65cichj703cnsfin0pddofl36kuale0k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mahilasaarthi.customer",
+            "certificate_hash": "85f27abd25f14c75b98be2dba4f0130278ae86b2"
+          }
+        },
+        {
+          "client_id": "697070209321-ne6k6edgcorek03dr3qsr17jdrqa9e2a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mahilasaarthi.customer",
+            "certificate_hash": "7833bd891583adc8f0fb1aad3b8a6fa3eac0bb0c"
+          }
+        },
+        {
+          "client_id": "697070209321-pv5qsvmoi67f9ovfuq67j1nsk1i4umf3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mahilasaarthi.customer",
+            "certificate_hash": "6c6ae48a1990a3bf17e4d25018212540ab498535"
+          }
+        },
+        {
+          "client_id": "697070209321-r5s0nmkspfj4v8qak5rt3p32to7vvevd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mahilasaarthi.customer",
+            "certificate_hash": "17768eaa77355cb2eb5732a2159100b01ee9a354"
+          }
+        },
+        {
+          "client_id": "697070209321-dl8nsi4k4bd8dp0daq92jp1fa3k92315.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhxJehRZhq7jCldxsVqrApD-fAebKEeV0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "697070209321-dl8nsi4k4bd8dp0daq92jp1fa3k92315.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697070209321:android:8ea9b558607ec3e365cf38",
+        "android_client_info": {
+          "package_name": "com.mahilasaarthi.delivery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "697070209321-0s0br8qrbdu0r13ln7u07lb15bhgkjda.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mahilasaarthi.delivery",
+            "certificate_hash": "6c6ae48a1990a3bf17e4d25018212540ab498535"
+          }
+        },
+        {
+          "client_id": "697070209321-b6dsl0216spkvheg1b3nurscach67516.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mahilasaarthi.delivery",
+            "certificate_hash": "85f27abd25f14c75b98be2dba4f0130278ae86b2"
+          }
+        },
+        {
+          "client_id": "697070209321-dn23vn2i3dsmfd2f4c3kkm0fufo36ant.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mahilasaarthi.delivery",
+            "certificate_hash": "17768eaa77355cb2eb5732a2159100b01ee9a354"
+          }
+        },
+        {
+          "client_id": "697070209321-rr9d5qjech9aklshpdhipob7brpja60l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mahilasaarthi.delivery",
+            "certificate_hash": "989298672778c76b56f0f9d5dec0d5220a3fdba8"
+          }
+        },
+        {
+          "client_id": "697070209321-t2qfb78u4675fu3ktqb3d553eguek29u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mahilasaarthi.delivery",
+            "certificate_hash": "7833bd891583adc8f0fb1aad3b8a6fa3eac0bb0c"
+          }
+        },
+        {
+          "client_id": "697070209321-dl8nsi4k4bd8dp0daq92jp1fa3k92315.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhxJehRZhq7jCldxsVqrApD-fAebKEeV0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "697070209321-dl8nsi4k4bd8dp0daq92jp1fa3k92315.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697070209321:android:40cad76a5675fa0065cf38",
+        "android_client_info": {
+          "package_name": "com.mahilasaarthi.vendor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "697070209321-c8sshgkd23t1dta3t95uqrn8c455d40b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mahilasaarthi.vendor",
+            "certificate_hash": "7833bd891583adc8f0fb1aad3b8a6fa3eac0bb0c"
+          }
+        },
+        {
+          "client_id": "697070209321-dl8nsi4k4bd8dp0daq92jp1fa3k92315.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhxJehRZhq7jCldxsVqrApD-fAebKEeV0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "697070209321-dl8nsi4k4bd8dp0daq92jp1fa3k92315.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

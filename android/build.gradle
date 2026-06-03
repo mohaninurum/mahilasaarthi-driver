@@ -1,0 +1,71 @@
+buildscript {
+    ext.kotlin_version = '1.8.21'
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.1.3'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.google.gms:google-services:4.3.10'  // Google Services plugin
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.7.1'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven {
+            url  "https://phonepe.mycloudrepo.io/public/repositories/phonepe-intentsdk-android"
+        }
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                if (namespace == null) {
+                    def pluginNamespaces = [
+                        'audio_session': 'com.ryanheise.audio_session',
+                        'fluttertoast': 'io.github.ponnamkarthik.toast.fluttertoast'
+                    ]
+                    if (pluginNamespaces.containsKey(project.name)) {
+                        namespace pluginNamespaces[project.name]
+                    } else {
+                        def manifestFile = project.file('src/main/AndroidManifest.xml')
+                        if (manifestFile.exists()) {
+                            try {
+                                def parsedManifest = new XmlParser().parse(manifestFile)
+                                def packageName = parsedManifest.'@package'
+                                if (packageName != null) {
+                                    namespace packageName
+                                } else {
+                                    namespace project.group
+                                }
+                            } catch (Exception e) {
+                                namespace project.group
+                            }
+                        } else {
+                            namespace project.group
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
