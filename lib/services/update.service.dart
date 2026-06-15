@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-class UpdateService {
+mixin class UpdateService {
   //
   handleAppUpdate(BuildContext context) async {
     // final show = await AppUpgradeSettings.showUpgrade();

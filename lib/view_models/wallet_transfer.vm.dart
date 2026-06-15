@@ -84,7 +84,7 @@ class WalletTransferViewModel extends MyBaseViewModel {
       builder: (context) {
         return WalletAmountEntryBottomSheet(
           onSubmit: (String amount) {
-            viewContext.pop();
+            Navigator.pop(viewContext);
             initiateWalletTopUp(amount);
           },
         );
@@ -125,8 +125,8 @@ class WalletTransferViewModel extends MyBaseViewModel {
           text: apiResponse.message,
           onConfirmBtnTap: apiResponse.allGood
               ? () {
-                  viewContext.pop();
-                  viewContext.pop();
+                  Navigator.pop(viewContext);
+                  Navigator.pop(viewContext);
                 }
               : null,
         );
@@ -143,3 +143,6 @@ class WalletTransferViewModel extends MyBaseViewModel {
     }
   }
 }
+
+
+

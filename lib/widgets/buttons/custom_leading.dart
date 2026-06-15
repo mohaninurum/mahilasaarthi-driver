@@ -30,7 +30,7 @@ class CustomLeading extends StatelessWidget {
       )
           .p(padding ?? 4)
           .onInkTap(() {
-            context.pop();
+            Navigator.pop(context);
           })
           .box
           .shadowSm
@@ -41,3 +41,6 @@ class CustomLeading extends StatelessWidget {
     );
   }
 }
+
+
+

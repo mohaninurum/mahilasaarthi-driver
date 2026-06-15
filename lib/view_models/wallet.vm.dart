@@ -78,7 +78,7 @@ class WalletViewModel extends MyBaseViewModel {
       builder: (context) {
         return WalletAmountEntryBottomSheet(
           onSubmit: (String amount) {
-            viewContext.pop();
+            Navigator.pop(viewContext);
             Phonepe().start(context, (double.parse(amount) * 100).toString());
           },
         );
@@ -100,3 +100,6 @@ class WalletViewModel extends MyBaseViewModel {
     setBusy(false);
   }
 }
+
+
+

@@ -34,7 +34,8 @@ subprojects {
                 if (namespace == null) {
                     def pluginNamespaces = [
                         'audio_session': 'com.ryanheise.audio_session',
-                        'fluttertoast': 'io.github.ponnamkarthik.toast.fluttertoast'
+                        'fluttertoast': 'io.github.ponnamkarthik.toast.fluttertoast',
+                        'assets_audio_player': 'com.github.florent37.assets_audio_player'
                     ]
                     if (pluginNamespaces.containsKey(project.name)) {
                         namespace pluginNamespaces[project.name]

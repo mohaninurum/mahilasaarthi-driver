@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -14,10 +15,21 @@ class NewTaxiOrderAlertViewModel extends MyBaseViewModel {
   OrderRequest orderRequest = OrderRequest();
   TaxiRequest taxiRequest = TaxiRequest();
   NewTaxiOrder newOrder;
-  bool canDismiss = false;
   CountDownController countDownTimerController = CountDownController();
   NewTaxiOrderAlertViewModel(this.newOrder, BuildContext context) {
     this.viewContext = context;
+  }
+
+  StreamSubscription<DocumentSnapshot>? orderAlertSubscription;
+  bool _isPopped = false;
+
+  void _popContext([dynamic result]) {
+    if (!_isPopped) {
+      _isPopped = true;
+      if (viewContext.mounted) {
+        Navigator.pop(viewContext, result);
+      }
+    }
   }
 
   initialise() {
@@ -25,6 +37,37 @@ class NewTaxiOrderAlertViewModel extends MyBaseViewModel {
     AppService().playNotificationSound();
     //
     countDownTimerController.start();
+
+    // Listen to firestore to auto close if customer cancels
+    if (newOrder.docRef != null) {
+      orderAlertSubscription = FirebaseFirestore.instance.doc(newOrder.docRef!).snapshots().listen((snapshot) {
+        if (!snapshot.exists) {
+          _closeSilently();
+        } else {
+          final data = snapshot.data();
+          if (data != null && (data as Map<String, dynamic>)['status'] == 'cancelled') {
+            _closeSilently();
+          }
+        }
+      });
+    }
+  }
+
+  void _closeSilently() {
+    if (isBusy) {
+      // Do not close silently if we are currently accepting the order.
+      // The backend or our own app deleting the document will trigger this listener,
+      // and we must not interrupt the acceptance process.
+      return;
+    }
+    AppService().stopNotificationSound();
+    _popContext();
+  }
+
+  @override
+  void dispose() {
+    orderAlertSubscription?.cancel();
+    super.dispose();
   }
 
   void processOrderAcceptance() async {
@@ -35,6 +78,7 @@ class NewTaxiOrderAlertViewModel extends MyBaseViewModel {
         status: "preparing",
       );
       
+      orderAlertSubscription?.cancel();
       // Remove from firebase so other drivers don't see it or we don't get it again
       if (newOrder.docRef != null) {
         try {
@@ -44,39 +88,33 @@ class NewTaxiOrderAlertViewModel extends MyBaseViewModel {
         }
       }
 
-      AppService().assetsAudioPlayer.stop();
-      //
-      viewContext.pop(order);
-      // return;
+      AppService().stopNotificationSound();
+      setBusy(false);
+      _popContext(order);
+      return;
     } catch (error) {
-      viewContext.showToast(
-        msg: "$error",
-        bgColor: Colors.red,
-        textColor: Colors.white,
-        textSize: 20,
-      );
-
-      //
-      canDismiss = true;
+      if (viewContext.mounted) {
+        viewContext.showToast(
+          msg: "$error",
+          bgColor: Colors.red,
+          textColor: Colors.white,
+          textSize: 20,
+        );
+      }
     }
     setBusy(false);
-    //
-    if (canDismiss) {
-      AppService().assetsAudioPlayer.stop();
-      viewContext.pop();
-    }
+    AppService().stopNotificationSound();
+    _popContext();
   }
 
   void countDownCompleted(bool started) async {
     print('Countdown Ended');
     if (started) {
       if (isBusy) {
-        canDismiss = true;
+        // Do nothing, processOrderAcceptance is running and will handle pop
       } else {
-        AppService().assetsAudioPlayer.stop();
-        viewContext.pop();
-        //STOP NOTIFICATION SOUND
         AppService().stopNotificationSound();
+        _popContext();
         //silently reject order assignment
         setBusy(true);
         try {
@@ -93,3 +131,6 @@ class NewTaxiOrderAlertViewModel extends MyBaseViewModel {
     }
   }
 }
+
+
+

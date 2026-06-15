@@ -64,3 +64,5 @@ class VehiclesViewModel extends MyBaseViewModel {
     }
   }
 }
+
+

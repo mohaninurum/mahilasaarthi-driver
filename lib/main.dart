@@ -118,9 +118,10 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
         await suspendingCallBack();
         break;
       case AppLifecycleState.paused:
-
       case AppLifecycleState.detached:
         await closed();
+        break;
+      default:
         break;
     }
   }

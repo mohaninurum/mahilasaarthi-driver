@@ -1,0 +1,34 @@
+{
+    "logs": [
+        {
+            "outputFile": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\phonepe_payment_sdk\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values-v18\\values-v18.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\85d57400e720c6359b5e4014613533cf\\transformed\\appcompat-1.3.1\\res\\values-v18\\values-v18.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "48",
+                        "endOffsets": "99"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\phonepe_payment_sdk\\intermediates\\merged_res\\release\\values-v18\\values-v18.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\85d57400e720c6359b5e4014613533cf\\transformed\\appcompat-1.3.1\\res\\values-v18\\values-v18.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "48",
+                        "endOffsets": "99"
+                    }
+                }
+            ]
+        }
+    ]
+}

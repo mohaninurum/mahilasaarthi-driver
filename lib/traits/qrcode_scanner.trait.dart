@@ -3,7 +3,7 @@ import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class QrcodeScannerTrait {
+mixin class QrcodeScannerTrait {
   //scanning
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   Barcode? result;
@@ -26,7 +26,7 @@ class QrcodeScannerTrait {
                   // controller.toggleFlash();
                   controller.scannedDataStream.listen((scanData) {
                     //close dialog
-                    viewContext.pop(scanData.code);
+                    Navigator.pop(viewContext, scanData.code);
                   });
                 },
               ).h48(context),
@@ -59,3 +59,6 @@ class QrcodeScannerTrait {
     return result;
   }
 }
+
+
+

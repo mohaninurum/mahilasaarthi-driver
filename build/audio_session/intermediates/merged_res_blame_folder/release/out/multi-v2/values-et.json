@@ -1,0 +1,68 @@
+{
+    "logs": [
+        {
+            "outputFile": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\audio_session\\intermediates\\merged_res\\release\\values-et\\values-et.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\7f9e54b152203774b9b33e9e1e3f0349\\transformed\\core-1.6.0\\res\\values-et\\values-et.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "100",
+                        "endOffsets": "151"
+                    },
+                    "to": {
+                        "startLines": "7",
+                        "startColumns": "4",
+                        "startOffsets": "638",
+                        "endColumns": "100",
+                        "endOffsets": "734"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\d0628ce8599c31757cb78ee361708d76\\transformed\\media2-session-1.2.0\\res\\values-et\\values-et.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6",
+                        "startColumns": "4,4,4,4,4",
+                        "startOffsets": "55,163,264,363,499",
+                        "endColumns": "107,100,98,135,138",
+                        "endOffsets": "158,259,358,494,633"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\audio_session\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values-et\\values-et.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\7f9e54b152203774b9b33e9e1e3f0349\\transformed\\core-1.6.0\\res\\values-et\\values-et.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "100",
+                        "endOffsets": "151"
+                    },
+                    "to": {
+                        "startLines": "7",
+                        "startColumns": "4",
+                        "startOffsets": "638",
+                        "endColumns": "100",
+                        "endOffsets": "734"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\d0628ce8599c31757cb78ee361708d76\\transformed\\media2-session-1.2.0\\res\\values-et\\values-et.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6",
+                        "startColumns": "4,4,4,4,4",
+                        "startOffsets": "55,163,264,363,499",
+                        "endColumns": "107,100,98,135,138",
+                        "endOffsets": "158,259,358,494,633"
+                    }
+                }
+            ]
+        }
+    ]
+}

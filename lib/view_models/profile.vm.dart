@@ -114,7 +114,7 @@ class ProfileViewModel extends MyBaseViewModel {
       title: "Logout".tr(),
       text: "Are you sure you want to logout?".tr(),
       onConfirmBtnTap: () {
-        viewContext.pop();
+        Navigator.pop(viewContext);
         processLogout();
       },
     );
@@ -134,7 +134,7 @@ class ProfileViewModel extends MyBaseViewModel {
     final apiResponse = await _authRequest.logoutRequest();
 
     //
-    viewContext.pop();
+    Navigator.pop(viewContext);
 
     if (!apiResponse.allGood) {
       //
@@ -161,7 +161,7 @@ class ProfileViewModel extends MyBaseViewModel {
   }
 
   openPaymentAccounts() async {
-    viewContext.push((context) => PaymentAccountPage());
+    Navigator.push(viewContext, MaterialPageRoute(builder: (context) => PaymentAccountPage()));
   }
 
   openNotification() async {
@@ -235,3 +235,6 @@ class ProfileViewModel extends MyBaseViewModel {
     viewContext.nextPage(AccountDeletePage());
   }
 }
+
+
+

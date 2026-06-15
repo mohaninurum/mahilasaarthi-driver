@@ -12,6 +12,7 @@ import 'package:mahilasaarthi/constants/app_theme.dart';
 import 'package:mahilasaarthi/requests/settings.request.dart';
 import 'package:mahilasaarthi/services/auth.service.dart';
 import 'package:mahilasaarthi/services/firebase.service.dart';
+import 'package:mahilasaarthi/services/local_storage.service.dart';
 import 'package:mahilasaarthi/utils/utils.dart';
 import 'package:mahilasaarthi/views/pages/permission/permission.page.dart';
 import 'package:mahilasaarthi/widgets/cards/language_selector.view.dart';
@@ -40,6 +41,15 @@ class SplashViewModel extends MyBaseViewModel {
     setBusy(true);
     try {
       final appSettingsObject = await settingsRequest.appSettings();
+      // Fetch emergency contacts explicitly
+      try {
+        final emergencyResult = await settingsRequest.emergencyContacts();
+        final driverSOS = emergencyResult.body["driverEmergencyContact"] ?? "112";
+        await LocalStorageService.prefs?.setString('customDriverSOS', driverSOS);
+      } catch (e) {
+        print("Emergency contacts fetch error: $e");
+      }
+      
       //app settings
       await updateAppVariables(appSettingsObject.body["strings"]);
       //colors

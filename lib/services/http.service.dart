@@ -43,22 +43,42 @@ class HttpService {
     dio.interceptors.add(getCacheManager().interceptor);
     dio.interceptors.add(CurlLoggerInterceptor());
     
-    // Add interceptor for handling 401 Unauthorized globally (Single Device Login)
+    // Add interceptor for handling API responses and 401 Unauthorized globally
     dio.interceptors.add(
       InterceptorsWrapper(
         onResponse: (response, handler) async {
+          if (kDebugMode) {
+            print("🟢 API RESPONSE [${response.statusCode}] => ${response.requestOptions.path}");
+            print("Data: ${response.data}");
+            print("----------------------------------------------------------");
+          }
+
           if (response.statusCode == 401) {
             try {
-              await AuthServices.logout();
-              AppService().navigatorKey.currentState?.pushNamedAndRemoveUntil(
-                    AppRoutes.welcomeRoute,
-                    (route) => false,
-                  );
+              final path = response.requestOptions.path;
+              bool isAuthEndpoint = path.contains('/login') || path.contains('/otp/') || path.contains('/register');
+              
+              if (!isAuthEndpoint) {
+                await AuthServices.logout();
+                AppService().navigatorKey.currentState?.pushNamedAndRemoveUntil(
+                      AppRoutes.welcomeRoute,
+                      (route) => false,
+                    );
+              }
             } catch (error) {
               print("Logout error on 401: $error");
             }
           }
           return handler.next(response);
+        },
+        onError: (DioError e, handler) {
+          if (kDebugMode) {
+            print("🔴 API ERROR [${e.response?.statusCode}] => ${e.requestOptions.path}");
+            print("Message: ${e.message}");
+            print("Data: ${e.response?.data}");
+            print("----------------------------------------------------------");
+          }
+          return handler.next(e);
         },
       ),
     );

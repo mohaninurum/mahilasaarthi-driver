@@ -152,15 +152,15 @@ class TaxiViewModel extends MyBaseViewModel {
     finishedTrip =
         finishedOrderTrip != null ? finishedOrderTrip! : finishedTrip;
     //
-    await viewContext.push(
+    await Navigator.push(viewContext, MaterialPageRoute(builder: 
       (context) => UserRatingBottomSheet(
         order: finishedTrip,
         onSubmitted: () {
-          viewContext.pop();
+          Navigator.pop(viewContext);
           resetOrderListener();
         },
       ),
-    );
+    ));
 
     //
     resetOrderListener();
@@ -175,3 +175,8 @@ class TaxiViewModel extends MyBaseViewModel {
     taxiGoogleMapManagerService.updateGoogleMapPadding(20);
   }
 }
+
+
+
+
+

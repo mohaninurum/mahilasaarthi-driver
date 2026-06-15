@@ -133,23 +133,24 @@ class ForgotPasswordViewModel extends MyBaseViewModel {
   processCustomForgotPassword(String phoneNumber) async {
     setBusy(true);
     try {
-      await _authRequest.sendOTP(phoneNumber);
+      final response = await _authRequest.sendOTP(phoneNumber);
       setBusy(false);
-      showVerificationEntry();
+      showVerificationEntry(response.body?['otp_code']?.toString());
     } catch (error) {
       setBusy(false);
       viewContext.showToast(msg: "$error", bgColor: Colors.red);
     }
   }
 
-  void showVerificationEntry() async {
+  void showVerificationEntry([String? otpCode]) async {
     //
     setBusy(false);
     //
-    await viewContext.push(
+    await Navigator.push(viewContext, MaterialPageRoute(builder: 
       (context) => AccountVerificationEntry(
         vm: this,
         phone: accountPhoneNumber!,
+        otpCode: otpCode,
         onSubmit: (smsCode) {
           //
           if (!AppStrings.isCustomOtp) {
@@ -157,7 +158,7 @@ class ForgotPasswordViewModel extends MyBaseViewModel {
           } else {
             verifyCustomOTP(smsCode);
           }
-          viewContext.pop();
+          Navigator.pop(viewContext);
         },
         onResendCode: AppStrings.isCustomOtp
             ? () async {
@@ -171,7 +172,7 @@ class ForgotPasswordViewModel extends MyBaseViewModel {
                 await processFirebaseForgotPassword(accountPhoneNumber!);
               },
       ),
-    );
+    ));
   }
 
   //verify the provided code with the firebase server
@@ -232,7 +233,7 @@ class ForgotPasswordViewModel extends MyBaseViewModel {
           onSubmit: (password) {
             //
             finishChangeAccountPassword();
-            viewContext.pop();
+            Navigator.pop(viewContext);
           },
         );
       },

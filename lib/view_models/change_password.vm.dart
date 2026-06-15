@@ -49,11 +49,14 @@ class ChangePasswordViewModel extends MyBaseViewModel {
         onConfirmBtnTap: apiResponse.allGood
             ? () {
                 //
-                viewContext.pop();
-                viewContext.pop(true);
+                Navigator.pop(viewContext);
+                Navigator.pop(viewContext, true);
               }
             : null,
       );
     }
   }
 }
+
+
+

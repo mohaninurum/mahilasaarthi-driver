@@ -3,7 +3,7 @@
 // This file is generated from template in file `flutter_tools/lib/src/flutter_plugins.dart`.
 //
 
-// @dart = 2.17
+// @dart = 3.0
 
 import 'dart:io'; // flutter_ignore: dart_io_import.
 import 'package:geolocator_android/geolocator_android.dart';
@@ -30,6 +30,7 @@ import 'package:url_launcher_linux/url_launcher_linux.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:file_selector_macos/file_selector_macos.dart';
 import 'package:flutter_keyboard_visibility_macos/flutter_keyboard_visibility_macos.dart';
+import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:image_picker_macos/image_picker_macos.dart';
 import 'package:path_provider_macos/path_provider_macos.dart';
 import 'package:shared_preferences_foundation/shared_preferences_foundation.dart';
@@ -266,6 +267,15 @@ class _PluginRegistrant {
       } catch (err) {
         print(
           '`flutter_keyboard_visibility_macos` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
+      try {
+        GeolocatorApple.registerWith();
+      } catch (err) {
+        print(
+          '`geolocator_apple` threw an error: $err. '
           'The app may not function as expected until you remove this plugin from pubspec.yaml'
         );
       }

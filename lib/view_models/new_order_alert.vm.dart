@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mahilasaarthi/models/new_order.dart';
 import 'package:mahilasaarthi/requests/order.request.dart';
@@ -16,29 +18,63 @@ class NewOrderAlertViewModel extends MyBaseViewModel {
     this.viewContext = context;
   }
 
+  StreamSubscription<DocumentSnapshot>? orderAlertSubscription;
+
   initialise() {
     //
     AppService().playNotificationSound();
     //
     countDownTimerController.start();
+
+    // Listen to firestore to auto close if customer cancels
+    if (newOrder.docRef != null) {
+      orderAlertSubscription = FirebaseFirestore.instance.doc(newOrder.docRef!).snapshots().listen((snapshot) {
+        if (!snapshot.exists) {
+          _closeSilently();
+        } else {
+          final data = snapshot.data();
+          if (data != null && (data as Map<String, dynamic>)['status'] == 'cancelled') {
+            _closeSilently();
+          }
+        }
+      });
+    }
+  }
+
+  void _closeSilently() {
+    AppService().stopNotificationSound();
+    if (viewContext.mounted && !canDismiss) {
+      canDismiss = true;
+      Navigator.pop(viewContext);
+    }
+  }
+
+  @override
+  void dispose() {
+    orderAlertSubscription?.cancel();
+    super.dispose();
   }
 
   void processOrderAcceptance() async {
     setBusy(true);
     try {
       await orderRequest.acceptNewOrder(newOrder.id!);
-      AppService().assetsAudioPlayer.stop();
+      AppService().stopNotificationSound();
 
       //
-      viewContext.pop(true);
+      if (viewContext.mounted) {
+        Navigator.pop(viewContext, true);
+      }
       return;
     } catch (error) {
-      viewContext.showToast(
-        msg: "$error",
-        bgColor: Colors.red,
-        textColor: Colors.white,
-        textSize: 20,
-      );
+      if (viewContext.mounted) {
+        viewContext.showToast(
+          msg: "$error",
+          bgColor: Colors.red,
+          textColor: Colors.white,
+          textSize: 20,
+        );
+      }
 
       //
       canDismiss = true;
@@ -46,8 +82,10 @@ class NewOrderAlertViewModel extends MyBaseViewModel {
     setBusy(false);
     //
     if (canDismiss) {
-      AppService().assetsAudioPlayer.stop();
-      viewContext.pop();
+      AppService().stopNotificationSound();
+      if (viewContext.mounted) {
+        Navigator.pop(viewContext);
+      }
     }
   }
 
@@ -57,11 +95,14 @@ class NewOrderAlertViewModel extends MyBaseViewModel {
       if (isBusy) {
         canDismiss = true;
       } else {
-        AppService().assetsAudioPlayer.stop();
-        viewContext.pop();
-        //STOP NOTIFICATION SOUND
         AppService().stopNotificationSound();
+        if (viewContext.mounted) {
+          Navigator.pop(viewContext);
+        }
       }
     }
   }
 }
+
+
+

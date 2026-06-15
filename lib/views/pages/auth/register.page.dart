@@ -72,7 +72,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         size: 24,
                         color: Utils.textColorByTheme(),
                       ).p8().onInkTap(() {
-                        context.pop();
+                        Navigator.pop(context);
                       }).p12(),
                     ],
                   ),
@@ -380,13 +380,26 @@ class _RegisterPageState extends State<RegisterPage> {
                                   .make(),
                             ],
                           ).make(),
-                          validator: (value) =>
-                              CustomFormBuilderValidator.required(
-                                value,
-                                errorTitle:
-                                "Please confirm you have accepted our terms and conditions"
-                                    .tr(),
-                              ),
+                          validator: (value) {
+                            if (value != true) {
+                              return "Please confirm you have accepted our terms and conditions".tr();
+                            }
+                            return null;
+                          },
+                        ),
+
+                        FormBuilderCheckbox(
+                          name: "aadhaar_consent",
+                          title: "I hereby consent to the collection and verification of my Aadhaar details for identity verification purposes."
+                              .tr()
+                              .text
+                              .make(),
+                          validator: (value) {
+                            if (value != true) {
+                              return "Please provide your consent for Aadhaar verification".tr();
+                            }
+                            return null;
+                          },
                         ),
 
                         CustomButton(
@@ -421,3 +434,6 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 }
+
+
+

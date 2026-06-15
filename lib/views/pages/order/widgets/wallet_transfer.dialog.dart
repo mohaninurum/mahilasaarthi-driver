@@ -51,7 +51,7 @@ class WalletTransferDialog extends StatelessWidget {
                 color: Colors.grey,
                 loading: vm.busy(vm.transferAmountTEC),
                 onPressed: () {
-                  context.pop();
+                  Navigator.pop(context);
                 },
               ).wFull(context).py8(),
             ],
@@ -61,3 +61,6 @@ class WalletTransferDialog extends StatelessWidget {
     );
   }
 }
+
+
+

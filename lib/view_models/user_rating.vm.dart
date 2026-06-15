@@ -48,10 +48,13 @@ class UserRatingViewModel extends MyBaseViewModel {
       onConfirmBtnTap: apiResponse.allGood
           ? () {
               //
-              viewContext.pop();
+              Navigator.pop(viewContext);
               onsubmitted();
             }
           : null,
     );
   }
 }
+
+
+

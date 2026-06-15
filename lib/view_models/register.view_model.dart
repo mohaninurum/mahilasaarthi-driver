@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:mahilasaarthi/constants/app_strings.dart';
 import 'package:mahilasaarthi/models/vehicle.dart';
@@ -171,16 +172,12 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
           return;
         }
 
-        // BYPASS OTP FOR NOW
-        await finishRegistration();
-        return;
-
         if (AppStrings.isFirebaseOtp) {
           await processFirebaseOTPVerification();
         } else if (AppStrings.isCustomOtp) {
           await processCustomOTPVerification();
         } else {
-          await finishRegistration();
+          await startAadhaarVerification();
         }
       } catch (error) {
         toastError("$error");
@@ -203,7 +200,7 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
               await FirebaseAuth.instance.signInWithCredential(credential);
           firebaseToken = await userCredential.user?.getIdToken();
           firebaseVerificationId = credential.verificationId;
-          await finishRegistration();
+          await startAadhaarVerification();
         } catch (error) {
           setBusy(false);
           print("RegisterViewModel: verificationCompleted error: $error");
@@ -237,44 +234,47 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
   Future<void> processCustomOTPVerification() async {
     setBusy(true);
     try {
-      await _authRequest.sendOTP(accountPhoneNumber!);
+      final response = await _authRequest.sendOTP(accountPhoneNumber!);
       setBusy(false);
-      showVerificationEntry();
+      showVerificationEntry(response.body?['otp_code']?.toString());
     } catch (error) {
       setBusy(false);
       toastError("$error");
     }
   }
 
-  void showVerificationEntry() async {
+  void showVerificationEntry([String? otpCode]) async {
     setBusy(false);
-    await viewContext.push(
-      (context) => AccountVerificationEntry(
-        vm: this,
-        phone: accountPhoneNumber!,
-        onSubmit: (smsCode) {
-          if (AppStrings.isFirebaseOtp) {
-            verifyFirebaseOTP(smsCode);
-          } else {
-            verifyCustomOTP(smsCode);
-          }
-          viewContext.pop();
-        },
-        onResendCode: AppStrings.isCustomOtp
-            ? () async {
-                try {
-                  final response =
-                      await _authRequest.sendOTP(accountPhoneNumber!);
-                  toastSuccessful(response.message ?? "Success".tr());
-                } catch (error) {
-                  toastError("$error");
-                }
+    await Navigator.push(
+        viewContext,
+        MaterialPageRoute(
+          builder: (context) => AccountVerificationEntry(
+            vm: this,
+            phone: accountPhoneNumber!,
+            otpCode: otpCode,
+            onSubmit: (smsCode) {
+              if (AppStrings.isFirebaseOtp) {
+                verifyFirebaseOTP(smsCode);
+              } else {
+                verifyCustomOTP(smsCode);
               }
-            : () async {
-                await processFirebaseOTPVerification();
-              },
-      ),
-    );
+              Navigator.pop(viewContext);
+            },
+            onResendCode: AppStrings.isCustomOtp
+                ? () async {
+                    try {
+                      final response =
+                          await _authRequest.sendOTP(accountPhoneNumber!);
+                      toastSuccessful(response.message ?? "Success".tr());
+                    } catch (error) {
+                      toastError("$error");
+                    }
+                  }
+                : () async {
+                    await processFirebaseOTPVerification();
+                  },
+          ),
+        ));
   }
 
   void verifyFirebaseOTP(String smsCode) async {
@@ -287,7 +287,7 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential);
       firebaseToken = await userCredential.user?.getIdToken();
-      await finishRegistration();
+      await startAadhaarVerification();
     } catch (error) {
       setBusy(false);
       toastError("$error");
@@ -303,10 +303,209 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         isLogin: false,
       );
       firebaseToken = apiResponse.body["token"];
-      await finishRegistration();
+      await startAadhaarVerification();
     } catch (error) {
       setBusy(false);
       toastError("$error");
+    }
+  }
+
+  String? aadhaarRefId;
+  String? aadhaarNumber;
+  Map<String, dynamic>? aadhaarDetails;
+
+  // --- AADHAAR & FACE VERIFICATION FLOW ---
+  Future<void> startAadhaarVerification() async {
+    setBusy(false);
+    TextEditingController aadhaarTEC = TextEditingController();
+    showDialog(
+      context: viewContext,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Aadhaar Verification".tr()),
+          content: TextField(
+            controller: aadhaarTEC,
+            keyboardType: TextInputType.number,
+            maxLength: 12,
+            decoration: InputDecoration(
+              hintText: "Enter 12-digit Aadhaar Number".tr(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Cancel".tr()),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (aadhaarTEC.text.length == 12) {
+                  Navigator.pop(context);
+                  submitAadhaarNumber(aadhaarTEC.text);
+                } else {
+                  toastError("Enter valid 12 digit Aadhaar".tr());
+                }
+              },
+              child: Text("Generate OTP".tr()),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> submitAadhaarNumber(String aadhaar) async {
+    setBusy(true);
+    try {
+      final response = await _authRequest.generateAadhaarOtp(aadhaar);
+      if (response.allGood || response.body['status'] == 'SUCCESS') {
+        aadhaarNumber = aadhaar;
+        aadhaarRefId = response.body['ref_id'];
+        setBusy(false);
+        String? otpCode = response.body['otp']?.toString() ?? response.body['otp_code']?.toString();
+        if (otpCode != null && otpCode.length == 6) {
+          submitAadhaarOtp(otpCode);
+        } else {
+          showAadhaarOtpEntry(otpCode);
+        }
+      } else {
+        toastError(response.body['message'] ?? "Aadhaar API Error");
+        setBusy(false);
+      }
+    } catch (e) {
+      toastError(e.toString());
+      setBusy(false);
+    }
+  }
+
+  void showAadhaarOtpEntry([String? otpCode]) {
+    TextEditingController otpTEC = TextEditingController(text: otpCode);
+    showDialog(
+      context: viewContext,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Aadhaar OTP".tr()),
+          content: TextField(
+            controller: otpTEC,
+            keyboardType: TextInputType.number,
+            maxLength: 6,
+            decoration: InputDecoration(
+              hintText: "Enter 6-digit Aadhaar OTP".tr(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Cancel".tr()),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (otpTEC.text.length == 6) {
+                  Navigator.pop(context);
+                  submitAadhaarOtp(otpTEC.text);
+                } else {
+                  toastError("Enter valid OTP".tr());
+                }
+              },
+              child: Text("Verify OTP".tr()),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> submitAadhaarOtp(String otp) async {
+    if (aadhaarRefId == null) return;
+    setBusy(true);
+    try {
+      final response = await _authRequest.verifyAadhaarOtp(aadhaarRefId!, otp);
+      if (response.allGood ||
+          response.body['status'] == 'SUCCESS' ||
+          response.body['status'] == 'VALID') {
+        aadhaarDetails = response.body;
+
+        // Check gender
+        String? gender;
+        if (response.body != null) {
+          gender = response.body['gender']?.toString().toUpperCase();
+        }
+
+        if (gender == 'M' || gender == 'MALE') {
+          setBusy(false);
+          showDialog(
+            context: viewContext,
+            barrierDismissible: false,
+            builder: (context) {
+              return AlertDialog(
+                title: Text("Registration Failed".tr()),
+                content: Text("Only female can register on Mahila Saarthi.".tr()),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text("OK".tr()),
+                  ),
+                ],
+              );
+            },
+          );
+          return;
+        }
+
+        toastSuccessful("Aadhaar Verified Successfully!".tr());
+        setBusy(false);
+        // Step 3: Face Liveness
+        startFaceLivenessCheck();
+      } else {
+        toastError(response.body['message'] ?? "Invalid Aadhaar OTP");
+        setBusy(false);
+      }
+    } catch (e) {
+      toastError(e.toString());
+      setBusy(false);
+    }
+  }
+
+  Future<void> startFaceLivenessCheck() async {
+    // 1. Forcefully open the Front Camera for a Live Selfie
+    setBusy(false);
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.camera,
+      preferredCameraDevice: CameraDevice.front,
+      imageQuality: 70, // Compress slightly for faster upload
+    );
+
+    if (image == null) {
+      toastError(
+          "Camera closed. Live Selfie is required for verification!".tr());
+      return;
+    }
+
+    // 2. Save it and show loading state
+    File liveSelfie = File(image.path);
+    selfieImage =
+        liveSelfie; // update the main variable so it goes to backend in register API too
+
+    setBusy(true);
+    try {
+      final response = await _authRequest.verifyFaceLiveness(liveSelfie);
+      if (response.allGood || response.body['status'] == 'SUCCESS') {
+        if (response.body['liveness'] == true) {
+          toastSuccessful("Face Verified! Live person detected.".tr());
+          await finishRegistration();
+        } else {
+          toastError("Face Liveness Failed. Please take a clear selfie.".tr());
+          setBusy(false);
+        }
+      } else {
+        toastError(response.body['message'] ?? "Face Verification Error");
+        setBusy(false);
+      }
+    } catch (e) {
+      toastError(e.toString());
+      setBusy(false);
     }
   }
 
@@ -330,6 +529,19 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         } else {
           params["verification_token"] = firebaseToken;
         }
+      }
+
+      // Add Aadhaar details to params
+      if (aadhaarNumber != null) params["aadhaar_number"] = aadhaarNumber;
+      if (aadhaarDetails != null) {
+        params["aadhaar_verified"] = 1;
+        params["aadhaar_name"] =
+            aadhaarDetails!['name'] ?? aadhaarDetails!['full_name'];
+        params["aadhaar_gender"] = aadhaarDetails!['gender'];
+        params["aadhaar_dob"] = aadhaarDetails!['dob'];
+        params["aadhaar_address"] = aadhaarDetails!['address'] != null
+            ? aadhaarDetails!['address'].toString()
+            : null;
       }
 
       final apiResponse = await _authRequest.registerRequest(

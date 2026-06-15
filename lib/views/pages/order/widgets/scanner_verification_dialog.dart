@@ -62,7 +62,7 @@ class _ScanOrderVerificationDialogState
       if (widget.order.verificationCode == result?.code) {
         controller.stopCamera();
         controller.dispose();
-        context.pop();
+        Navigator.pop(context);
         widget.onValidated();
       } else {
         print("Invalid code");
@@ -76,3 +76,6 @@ class _ScanOrderVerificationDialogState
     super.dispose();
   }
 }
+
+
+

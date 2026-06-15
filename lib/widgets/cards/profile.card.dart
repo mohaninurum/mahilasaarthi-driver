@@ -19,33 +19,32 @@ class ProfileCard extends StatelessWidget {
             ? BusyIndicator().centered().p20()
             : HStack(
                 [
-                  //
-                  // (((model.currentUser?.photo ?? "").isEmpty ||
-                  //             !(model.currentUser?.photo ?? "")
-                  //                 .startsWith("http"))
-                  //         ? Image.asset(
-                  //             AppImages.user,
-                  //             fit: BoxFit.cover,
-                  //           )
-                  //         : CachedNetworkImage(
-                  //             imageUrl: model.currentUser?.photo ?? "",
-                  //             progressIndicatorBuilder:
-                  //                 (context, imageUrl, progress) {
-                  //               return BusyIndicator();
-                  //             },
-                  //             errorWidget: (context, imageUrl, progress) {
-                  //               return Image.asset(
-                  //                 AppImages.user,
-                  //                 fit: BoxFit.cover,
-                  //               );
-                  //             },
-                  //             fit: BoxFit.cover,
-                  //           ))
-                  //     .wh(Vx.dp64, Vx.dp64)
-                  //     .box
-                  //     .roundedFull
-                  //     .clip(Clip.antiAlias)
-                  //     .make(),
+                  (((model.currentUser?.photo ?? "").isEmpty ||
+                              !(model.currentUser?.photo ?? "")
+                                  .startsWith("http"))
+                          ? Image.asset(
+                              AppImages.user,
+                              fit: BoxFit.cover,
+                            )
+                          : CachedNetworkImage(
+                              imageUrl: model.currentUser?.photo ?? "",
+                              progressIndicatorBuilder:
+                                  (context, imageUrl, progress) {
+                                return BusyIndicator();
+                              },
+                              errorWidget: (context, imageUrl, progress) {
+                                return Image.asset(
+                                  AppImages.user,
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                              fit: BoxFit.cover,
+                            ))
+                      .wh(Vx.dp64, Vx.dp64)
+                      .box
+                      .roundedFull
+                      .clip(Clip.antiAlias)
+                      .make(),
 
                   //
                   VStack(

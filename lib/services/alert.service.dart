@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:mahilasaarthi/services/app.service.dart';
@@ -27,7 +28,7 @@ class AlertService {
         onConfirmBtnTap: () {
           if (onConfirm == null) {
             result = true;
-            AppService().navigatorKey.currentContext?.pop();
+            Navigator.pop(AppService().navigatorKey.currentContext!);
           } else {
             onConfirm();
           }
@@ -54,7 +55,7 @@ class AlertService {
         confirmBtnText: confirmBtnText.tr(),
         onConfirmBtnTap: () {
           result = true;
-          AppService().navigatorKey.currentContext?.pop();
+          Navigator.pop(AppService().navigatorKey.currentContext!);
         });
 
     //
@@ -77,7 +78,7 @@ class AlertService {
         confirmBtnText: confirmBtnText.tr(),
         onConfirmBtnTap: () {
           result = true;
-          AppService().navigatorKey.currentContext?.pop();
+          Navigator.pop(AppService().navigatorKey.currentContext!);
         });
 
     //
@@ -97,6 +98,10 @@ class AlertService {
   }
 
   static void stopLoading() {
-    AppService().navigatorKey.currentContext?.pop();
+    Navigator.pop(AppService().navigatorKey.currentContext!);
   }
 }
+
+
+
+

@@ -68,7 +68,7 @@ class _TaxiOrderDetailPageState extends State<TaxiOrderDetailPage> {
                 //         (context) => UserRatingBottomSheet(
                 //       order: vm.order,
                 //       onSubmitted: () {
-                //         context.pop();
+                //         Navigator.pop(context);
                 //       },
                 //     ),
                 //   );
@@ -101,3 +101,6 @@ class _TaxiOrderDetailPageState extends State<TaxiOrderDetailPage> {
 
 
 }
+
+
+

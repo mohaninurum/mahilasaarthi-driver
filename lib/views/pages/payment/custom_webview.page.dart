@@ -129,7 +129,7 @@ class _CustomWebviewPageState extends State<CustomWebviewPage> {
     if (pageClosed) {
       return;
     }
-    AppService().navigatorKey.currentContext?.pop();
+    Navigator.pop(AppService().navigatorKey.currentContext!, );
     pageClosed = true;
     setState(() {
       pageClosed = true;
@@ -242,3 +242,7 @@ class _CustomWebviewPageState extends State<CustomWebviewPage> {
     );
   }
 }
+
+
+
+

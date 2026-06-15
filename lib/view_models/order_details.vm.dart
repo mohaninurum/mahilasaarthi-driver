@@ -145,11 +145,11 @@ class OrderDetailsViewModel extends MyBaseViewModel {
             return OrderVerificationDialog(
               order: order,
               onValidated: () {
-                AppService().navigatorKey.currentContext?.pop();
+                Navigator.pop(AppService().navigatorKey.currentContext!);
                 processOrderCompletion();
               },
               openQRCodeScanner: () {
-                AppService().navigatorKey.currentContext?.pop();
+                Navigator.pop(AppService().navigatorKey.currentContext!);
                 showQRCodeScanner();
               },
             );
@@ -158,9 +158,9 @@ class OrderDetailsViewModel extends MyBaseViewModel {
       }
       //verification via photo
       else if (AppStrings.verifyOrderByPhoto) {
-        final result = await viewContext.push(
+        final result = await Navigator.push(viewContext, MaterialPageRoute(builder: 
           (context) => PhotoVerificationPage(order: order),
-        );
+        ));
         //
         if (result is Order) {
           order = result;
@@ -171,9 +171,9 @@ class OrderDetailsViewModel extends MyBaseViewModel {
       }
       //verification via signature
       else {
-        final result = await viewContext.push(
+        final result = await Navigator.push(viewContext, MaterialPageRoute(builder: 
           (context) => SignatureVerificationPage(order: order),
-        );
+        ));
         //
         if (result is Order) {
           order = result;
@@ -196,7 +196,7 @@ class OrderDetailsViewModel extends MyBaseViewModel {
           child: ScanOrderVerificationDialog(
             order: order,
             onValidated: () {
-              // AppService().navigatorKey.currentContext.pop();
+              // AppService().navigatorKey.currentContext?.pop();
               processOrderCompletion();
             },
           ),
@@ -229,14 +229,14 @@ class OrderDetailsViewModel extends MyBaseViewModel {
             return CollectCashInfoDialog(order);
           },
         );
-     await viewContext.push(
+     await Navigator.push(viewContext, MaterialPageRoute(builder: 
            (context) => UserRatingBottomSheet(
          order: order,
          onSubmitted: () {
-           viewContext.pop();
+           Navigator.pop(viewContext);
          },
        ),
-     );
+     ));
       }
     } catch (error) {
       print("Error ==> $error");
@@ -286,7 +286,7 @@ class OrderDetailsViewModel extends MyBaseViewModel {
 
   onBackPressed() {
     //
-    AppService().navigatorKey.currentContext?.pop(changed ? order : null);
+    Navigator.pop(AppService().navigatorKey.currentContext!, changed ? order : null);
   }
 
   //
@@ -336,27 +336,27 @@ class OrderDetailsViewModel extends MyBaseViewModel {
   verifyStop(OrderStop stop) async {
     //code verification code
     if (AppStrings.verifyOrderByPhoto) {
-      await viewContext.push(
+      await Navigator.push(viewContext, MaterialPageRoute(builder: 
         (context) => PhotoVerificationPage(
           order: order,
           onsubmit: (photo) {
             processOrderStopVerification(stop, photo);
-            viewContext.pop();
+            Navigator.pop(viewContext);
           },
         ),
-      );
+      ));
     }
     //verification via signature
     else {
-      await viewContext.push(
+      await Navigator.push(viewContext, MaterialPageRoute(builder: 
         (context) => SignatureVerificationPage(
           order: order,
           onsubmit: (photo) {
             processOrderStopVerification(stop, photo);
-            viewContext.pop();
+            Navigator.pop(viewContext);
           },
         ),
-      );
+      ));
     }
   }
 
@@ -379,3 +379,9 @@ class OrderDetailsViewModel extends MyBaseViewModel {
     setBusyForObject(stop, false);
   }
 }
+
+
+
+
+
+

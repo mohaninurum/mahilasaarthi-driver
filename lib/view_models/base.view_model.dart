@@ -93,11 +93,11 @@ class MyBaseViewModel extends BaseViewModel {
       await launchUrlString(url);
       return;
     }
-    await viewContext.push(
+    await Navigator.push(viewContext, MaterialPageRoute(builder: 
       (context) => CustomWebviewPage(
         selectedUrl: url,
       ),
-    );
+    ));
   }
 
   Future<dynamic> openExternalWebpageLink(String url) async {
@@ -137,3 +137,6 @@ class MyBaseViewModel extends BaseViewModel {
     );
   }
 }
+
+
+

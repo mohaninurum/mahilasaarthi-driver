@@ -160,7 +160,7 @@ class HomeMenuView extends StatelessWidget {
                 color: Colors.white,
               ),
               onPressed: () {
-                context.pop();
+                Navigator.pop(context);
               },
             ).box.roundedFull.red500.make().positioned(top: 0, right: 20),
           ],
@@ -169,3 +169,6 @@ class HomeMenuView extends StatelessWidget {
     );
   }
 }
+
+
+

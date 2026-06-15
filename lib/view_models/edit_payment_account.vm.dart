@@ -59,8 +59,8 @@ class EditPaymentAccountViewModel extends MyBaseViewModel {
                   apiResponse.body["data"],
                 );
                 //
-                viewContext.pop();
-                viewContext.pop(newPaymentAccount);
+                Navigator.pop(viewContext);
+                Navigator.pop(viewContext, newPaymentAccount);
               }
             : null,
       );
@@ -68,3 +68,6 @@ class EditPaymentAccountViewModel extends MyBaseViewModel {
     }
   }
 }
+
+
+

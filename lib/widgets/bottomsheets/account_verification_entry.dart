@@ -18,12 +18,14 @@ class AccountVerificationEntry extends StatefulWidget {
     this.vm,
     Key? key,
     this.phone = "",
+    this.otpCode,
   }) : super(key: key);
 
   final Function(String) onSubmit;
   final Function? onResendCode;
   final dynamic vm;
   final String phone;
+  final String? otpCode;
 
   @override
   _AccountVerificationEntryState createState() =>
@@ -41,6 +43,24 @@ class _AccountVerificationEntryState extends State<AccountVerificationEntry> {
   @override
   void initState() {
     super.initState();
+    if (widget.otpCode != null && widget.otpCode!.isNotEmpty) {
+      pinTEC.text = widget.otpCode!;
+      smsCode = widget.otpCode;
+      
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (smsCode != null && smsCode!.length == 6) {
+          setState(() {
+            loading = true;
+          });
+          widget.onSubmit(smsCode!);
+          if (mounted) {
+            setState(() {
+              loading = false;
+            });
+          }
+        }
+      });
+    }
     //
     startCountDown();
   }
@@ -58,7 +78,7 @@ class _AccountVerificationEntryState extends State<AccountVerificationEntry> {
       title: "Verification Code".tr(),
       elevation: 0,
       leading: CustomLeading().onInkTap(() {
-        context.pop();
+        Navigator.pop(context);
       }),
       body: VStack(
         [
@@ -189,7 +209,7 @@ class _AccountVerificationEntryState extends State<AccountVerificationEntry> {
                   color: Utils.textColorByTheme(),
                 ),
                 onPressed: () {
-                  context.pop();
+                  Navigator.pop(context);
                 },
               ).expand(),
             ],
@@ -278,3 +298,6 @@ class _AccountVerificationEntryState extends State<AccountVerificationEntry> {
     }
   }
 }
+
+
+

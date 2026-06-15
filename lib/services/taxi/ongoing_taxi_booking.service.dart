@@ -201,6 +201,10 @@ class OnGoingTaxiBookingService extends TaxiPolylinesService {
         refreshSwipeBtnActionKey();
         taxiViewModel.taxiGoogleMapManagerService.clearMapData();
         taxiViewModel.newTaxiBookingService.startNewOrderListener();
+        taxiViewModel.onGoingOrderTrip = null;
+        if (Navigator.canPop(taxiViewModel.viewContext)) {
+          Navigator.pop(taxiViewModel.viewContext);
+        }
         break;
       default:
         taxiViewModel.taxiGoogleMapManagerService.clearMapData();
@@ -271,11 +275,11 @@ class OnGoingTaxiBookingService extends TaxiPolylinesService {
     tripUpdateStream = firebaseFireStore
         .collection("orders")
         .doc("${taxiViewModel.onGoingOrderTrip?.code}")
-        .snapshots()
+        .snapshots(includeMetadataChanges: true)
         .listen(
       (event) async {
         //update the rest onGoingTrip details
-        if (event.data() != null && event.data()!.containsKey("status")) {
+        if (event.exists && event.data() != null && event.data()!.containsKey("status")) {
           //assing the status
           final orderStatus = event.data()!["status"];
           taxiViewModel.onGoingOrderTrip?.status = orderStatus;
@@ -283,9 +287,15 @@ class OnGoingTaxiBookingService extends TaxiPolylinesService {
           print("Order Status Update ==> YEAHHH!!!!!!");
           taxiViewModel.notifyListeners();
           loadTripUIByOrderStatus();
-        } else {
-          //change status to cancelled if the data has been deleted but still exists locally
-          taxiViewModel.onGoingOrderTrip?.status = "cancelled";
+        } else if (!event.exists) {
+          // Only change status to cancelled if the data is definitively not on the server, 
+          // to prevent false positives when local cache hasn't synced the newly created document yet.
+          if (!event.metadata.isFromCache) {
+            // change status to cancelled if the data has been deleted but still exists locally
+            taxiViewModel.onGoingOrderTrip?.status = "cancelled";
+            taxiViewModel.notifyListeners();
+            loadTripUIByOrderStatus();
+          }
         }
       },
     );

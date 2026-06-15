@@ -1,0 +1,62 @@
+[
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\notification_template_media_custom.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\8f50160e148ee2d9e26aa1bfdec6b230\\transformed\\media-1.4.1\\res\\layout\\notification_template_media_custom.xml"
+    },
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\notification_template_big_media.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\8f50160e148ee2d9e26aa1bfdec6b230\\transformed\\media-1.4.1\\res\\layout\\notification_template_big_media.xml"
+    },
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\notification_template_big_media_narrow_custom.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\8f50160e148ee2d9e26aa1bfdec6b230\\transformed\\media-1.4.1\\res\\layout\\notification_template_big_media_narrow_custom.xml"
+    },
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\notification_media_cancel_action.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\8f50160e148ee2d9e26aa1bfdec6b230\\transformed\\media-1.4.1\\res\\layout\\notification_media_cancel_action.xml"
+    },
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\notification_template_icon_group.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\1bef544272139e9b587f61371ff1c75b\\transformed\\core-1.7.0\\res\\layout\\notification_template_icon_group.xml"
+    },
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\notification_media_action.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\8f50160e148ee2d9e26aa1bfdec6b230\\transformed\\media-1.4.1\\res\\layout\\notification_media_action.xml"
+    },
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\notification_template_big_media_custom.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\8f50160e148ee2d9e26aa1bfdec6b230\\transformed\\media-1.4.1\\res\\layout\\notification_template_big_media_custom.xml"
+    },
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\notification_template_part_chronometer.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\1bef544272139e9b587f61371ff1c75b\\transformed\\core-1.7.0\\res\\layout\\notification_template_part_chronometer.xml"
+    },
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\notification_template_media.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\8f50160e148ee2d9e26aa1bfdec6b230\\transformed\\media-1.4.1\\res\\layout\\notification_template_media.xml"
+    },
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\notification_action.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\1bef544272139e9b587f61371ff1c75b\\transformed\\core-1.7.0\\res\\layout\\notification_action.xml"
+    },
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\notification_template_part_time.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\1bef544272139e9b587f61371ff1c75b\\transformed\\core-1.7.0\\res\\layout\\notification_template_part_time.xml"
+    },
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\notification_template_big_media_narrow.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\8f50160e148ee2d9e26aa1bfdec6b230\\transformed\\media-1.4.1\\res\\layout\\notification_template_big_media_narrow.xml"
+    },
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\custom_dialog.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\1bef544272139e9b587f61371ff1c75b\\transformed\\core-1.7.0\\res\\layout\\custom_dialog.xml"
+    },
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\notification_template_lines_media.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\8f50160e148ee2d9e26aa1bfdec6b230\\transformed\\media-1.4.1\\res\\layout\\notification_template_lines_media.xml"
+    },
+    {
+        "merged": "D:\\InurumFlutter\\mg\\driver and customer\\mahilasaarthi\\driver\\build\\just_audio\\intermediates\\merged_res\\release\\layout\\notification_action_tombstone.xml",
+        "source": "C:\\Users\\Inurum_Four\\.gradle\\caches\\transforms-3\\1bef544272139e9b587f61371ff1c75b\\transformed\\core-1.7.0\\res\\layout\\notification_action_tombstone.xml"
+    }
+]

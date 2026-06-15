@@ -134,11 +134,13 @@ class OrderManagerService {
           //if is taxi
           if (hasVehicle) {
             final newTaxiOrder = NewTaxiOrder.fromJson(newOrderAlertData);
+            newTaxiOrder.docRef = newOrderDocsRef.path;
             print(
                 "OrderManagerService: [OLD matching] processing taxi order: ${newTaxiOrder.id}");
             TaxiBackgroundOrderService().processOrderNotification(newTaxiOrder);
           } else {
             final newOrder = NewOrder.fromJson(newOrderAlertData);
+            newOrder.docRef = newOrderDocsRef.path;
             print(
                 "OrderManagerService: [OLD matching] processing regular order: ${newOrder.id}");
             BackgroundOrderService().processOrderNotification(newOrder);

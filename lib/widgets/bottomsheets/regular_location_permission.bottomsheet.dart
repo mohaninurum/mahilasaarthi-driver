@@ -26,7 +26,7 @@ class RegularLocationPermissionDialog extends StatelessWidget {
           CustomButton(
             title: "Next".tr(),
             onPressed: () {
-              AppService().navigatorKey.currentContext?.pop(true);
+              Navigator.pop(AppService().navigatorKey.currentContext!, true);
             },
           ).py12(),
           Visibility(
@@ -35,7 +35,7 @@ class RegularLocationPermissionDialog extends StatelessWidget {
               title: "Cancel".tr(),
               color: Colors.grey[400],
               onPressed: () {
-                context.pop(false);
+                Navigator.pop(context, false);
                 // print("called here");
               },
             ),
@@ -45,3 +45,7 @@ class RegularLocationPermissionDialog extends StatelessWidget {
     );
   }
 }
+
+
+
+

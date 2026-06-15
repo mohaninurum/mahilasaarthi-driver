@@ -92,6 +92,9 @@ class AppLanguageSelector extends StatelessWidget {
     );
     await Utils.setJiffyLocale();
     //
-    context.pop(true);
+    Navigator.pop(context, true);
   }
 }
+
+
+

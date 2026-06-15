@@ -85,8 +85,8 @@ class EarningViewModel extends MyBaseViewModel {
             apiResponse.allGood ? "Successful".tr() : "${apiResponse.message}",
         onConfirmBtnTap: apiResponse.allGood
             ? () {
-                viewContext.pop();
-                viewContext.pop();
+                Navigator.pop(viewContext);
+                Navigator.pop(viewContext);
               }
             : null,
       );
@@ -95,3 +95,6 @@ class EarningViewModel extends MyBaseViewModel {
     }
   }
 }
+
+
+

@@ -58,9 +58,9 @@ class PaymentAccountViewModel extends MyBaseViewModel {
   //
 
   void openNewPaymentAccount() async {
-    final result = await viewContext.push(
+    final result = await Navigator.push(viewContext, MaterialPageRoute(builder: 
       (context) => NewPaymentAccountPage(),
-    );
+    ));
 
     //
     if (result != null && result is PaymentAccount) {
@@ -70,9 +70,9 @@ class PaymentAccountViewModel extends MyBaseViewModel {
   }
 
   void editPaymentAccount(PaymentAccount paymentAccount) async {
-    final result = await viewContext.push(
+    final result = await Navigator.push(viewContext, MaterialPageRoute(builder: 
       (context) => EditPaymentAccountPage(paymentAccount),
-    );
+    ));
 
     //
     if (result != null && result is PaymentAccount) {
@@ -85,3 +85,6 @@ class PaymentAccountViewModel extends MyBaseViewModel {
     }
   }
 }
+
+
+

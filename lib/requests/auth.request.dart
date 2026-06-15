@@ -280,4 +280,41 @@ class AuthRequest extends HttpService {
     );
     return ApiResponse.fromResponse(apiResult);
   }
+
+  // --- Cashfree Verification APIs ---
+  Future<ApiResponse> generateAadhaarOtp(String aadhaarNumber) async {
+    final apiResult = await post(
+      Api.generateAadhaarOtp,
+      {
+        "aadhaar_number": aadhaarNumber,
+      },
+    );
+    return ApiResponse.fromResponse(apiResult);
+  }
+
+  Future<ApiResponse> verifyAadhaarOtp(String refId, String otp) async {
+    final apiResult = await post(
+      Api.verifyAadhaarOtp,
+      {
+        "ref_id": refId,
+        "otp": otp,
+      },
+    );
+    return ApiResponse.fromResponse(apiResult);
+  }
+
+  Future<ApiResponse> verifyFaceLiveness(File photo) async {
+    final optimizedPhoto = await AppService().compressImageForUpload(photo);
+    FormData formData = FormData.fromMap({});
+    formData.files.add(
+      MapEntry("image", await MultipartFile.fromFile(optimizedPhoto.path)),
+    );
+    
+    final apiResult = await postCustomFiles(
+      Api.verifyFaceLiveness,
+      null,
+      formData: formData,
+    );
+    return ApiResponse.fromResponse(apiResult);
+  }
 }

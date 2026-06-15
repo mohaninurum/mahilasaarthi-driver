@@ -111,7 +111,7 @@ class NewVehicleViewModel extends MyBaseViewModel {
             title: "New Vehicle".tr(),
             text: "${apiResponse.message}",
           );
-          viewContext.pop(true);
+          Navigator.pop(viewContext, true);
           //
         } else {
           toastError("${apiResponse.message}");
@@ -124,3 +124,6 @@ class NewVehicleViewModel extends MyBaseViewModel {
     }
   }
 }
+
+
+

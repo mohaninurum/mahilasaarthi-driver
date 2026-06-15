@@ -32,7 +32,7 @@ class OrderPhotoVerificationViewModel extends MyBaseViewModel {
       //
       order = Order.fromJson(apiResponse.body["order"]);
       toastSuccessful(apiResponse.body["message"]);
-      viewContext.pop(order);
+      Navigator.pop(viewContext, order);
     } catch (error) {
       print("Error ==> $error");
       toastError("$error");
@@ -51,3 +51,6 @@ class OrderPhotoVerificationViewModel extends MyBaseViewModel {
     notifyListeners();
   }
 }
+
+
+

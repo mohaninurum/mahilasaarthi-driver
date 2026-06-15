@@ -36,7 +36,7 @@ class User {
         name: json['name'],
         email: json['email'],
         phone: json['phone'],
-        photo: json['photo'] ?? "",
+        photo: (json['photo'] ?? "").toString().replaceAll("///mahila-sarthi.mytechbro.com//", "/").replaceAll("mahila-sarthi.mytechbro.com/mahila-sarthi.mytechbro.com", "mahila-sarthi.mytechbro.com"),
         role: json['role_name'] ?? "client",
         vendorId: json['vendor_id'],
         rating: json['rating'].toString().toDouble() ?? 5.00,

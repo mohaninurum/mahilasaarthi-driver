@@ -63,9 +63,9 @@ class OrdersViewModel extends MyBaseViewModel {
   openOrderDetails(Order order) async {
     //
     if (order.taxiOrder != null) {
-      await viewContext.push(
+      await Navigator.push(viewContext, MaterialPageRoute(builder: 
         (context) => TaxiOrderDetailPage(order: order),
-      );
+      ));
       return;
     }
 
@@ -86,3 +86,6 @@ class OrdersViewModel extends MyBaseViewModel {
     fetchMyOrders();
   }
 }
+
+
+

@@ -51,7 +51,7 @@ class LocationServiceWatcher {
                     title: "Don't remind me again".tr(),
                     onPressed: () {
                       scheduler.dispose();
-                      context.pop(true);
+                      Navigator.pop(context, true);
                     },
                   ),
                 ],
@@ -79,3 +79,6 @@ class LocationServiceWatcher {
     );
   }
 }
+
+
+

@@ -157,9 +157,9 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
   processCustomOTPVerification() async {
     setBusyForObject(otpLogin, true);
     try {
-      await authRequest.sendOTP(accountPhoneNumber!);
+      final apiResponse = await authRequest.sendOTP(accountPhoneNumber!);
       setBusyForObject(otpLogin, false);
-      showVerificationEntry();
+      showVerificationEntry(apiResponse.body?['otp_code']?.toString());
     } catch (error) {
       setBusyForObject(otpLogin, false);
       viewContext.showToast(msg: "$error", bgColor: Colors.red);
@@ -167,14 +167,15 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
   }
 
   //
-  void showVerificationEntry() async {
+  void showVerificationEntry([String? otpCode]) async {
     //
     setBusy(false);
     //
-    await viewContext.push(
+    await Navigator.push(viewContext, MaterialPageRoute(builder: 
       (context) => AccountVerificationEntry(
         vm: this,
         phone: accountPhoneNumber!,
+        otpCode: otpCode,
         onSubmit: (smsCode) {
           //
           if (AppStrings.isFirebaseOtp) {
@@ -183,7 +184,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
             verifyCustomOTP(smsCode);
           }
 
-          viewContext.pop();
+          Navigator.pop(viewContext);
         },
         onResendCode: AppStrings.isCustomOtp
             ? () async {
@@ -199,7 +200,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
                 await processFirebaseOTPVerification();
               },
       ),
-    );
+    ));
   }
 
   //
@@ -363,3 +364,8 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
     // openExternalWebpageLink(url);
   }
 }
+
+
+
+
+

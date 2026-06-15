@@ -35,7 +35,7 @@ class LocationPermissionDialog extends StatelessWidget {
             title: "Next".tr(),
             onPressed: () {
               onResult(true);
-              AppService().navigatorKey.currentContext?.pop();
+              Navigator.pop(AppService().navigatorKey.currentContext!, );
             },
           ).py12(),
           Visibility(
@@ -45,7 +45,7 @@ class LocationPermissionDialog extends StatelessWidget {
               color: Colors.grey[400],
               onPressed: () {
                 onResult(false);
-                context.pop();
+                Navigator.pop(context);
               },
             ),
           ),
@@ -54,3 +54,8 @@ class LocationPermissionDialog extends StatelessWidget {
     );
   }
 }
+
+
+
+
+

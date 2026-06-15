@@ -55,7 +55,7 @@ class CollectCashInfoDialog extends StatelessWidget {
           CustomButton(
             title: "Yes, Collected".tr(),
             onPressed: () {
-              context.pop();
+              Navigator.pop(context);
             },
           )
         ],
@@ -63,3 +63,6 @@ class CollectCashInfoDialog extends StatelessWidget {
     );
   }
 }
+
+
+

@@ -38,29 +38,35 @@ class AppService {
     try {
       assetsAudioPlayer.stop();
     } catch (error) {
-      print("Error stopping audio player");
+      print("Error stopping audio player: $error");
     }
 
-    //
-    assetsAudioPlayer.open(
-      Audio("assets/audio/alert.mp3"),
-      loopMode: LoopMode.single,
-      notificationSettings: NotificationSettings(
-        nextEnabled: false,
-        prevEnabled: false,
-        stopEnabled: false,
-        seekBarEnabled: false,
-      ),
-      showNotification: true,
-      playInBackground: PlayInBackground.enabled,
-    );
+    try {
+      assetsAudioPlayer = AssetsAudioPlayer(); // Get singleton back
+      assetsAudioPlayer.open(
+        Audio("assets/audio/alert.mp3"),
+        autoStart: true,
+        loopMode: LoopMode.single,
+        notificationSettings: NotificationSettings(
+          nextEnabled: false,
+          prevEnabled: false,
+          stopEnabled: false,
+          seekBarEnabled: false,
+        ),
+        showNotification: true,
+        playInBackground: PlayInBackground.enabled,
+      );
+      assetsAudioPlayer.play(); // Explicit play just in case
+    } catch (error) {
+      print("Error playing audio: $error");
+    }
   }
 
   void stopNotificationSound() {
     try {
       assetsAudioPlayer.stop();
     } catch (error) {
-      print("Error stopping audio player");
+      print("Error stopping audio player: $error");
     }
   }
 

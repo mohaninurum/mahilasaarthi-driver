@@ -52,7 +52,7 @@ class Vehicle {
                   ? 1
                   : 0
               : json["is_active"] ?? 0,
-      photo: json["photo"],
+      photo: (json["photo"] ?? "").toString().replaceAll("///mahila-sarthi.mytechbro.com//", "/").replaceAll("mahila-sarthi.mytechbro.com/mahila-sarthi.mytechbro.com", "mahila-sarthi.mytechbro.com"),
       carModel: CarModel.fromJson(json["car_model"]),
       vehicleType: VehicleType.fromJson(json["vehicle_type"]),
       verified: json["verified"] ?? false,
@@ -159,7 +159,7 @@ class VehicleType {
         minFare: json["min_fare"].toString().toDouble()!,
         isActive: json["is_active"],
         formattedDate: json["formatted_date"],
-        photo: json["photo"],
+        photo: (json["photo"] ?? "").toString().replaceAll("///mahila-sarthi.mytechbro.com//", "/").replaceAll("mahila-sarthi.mytechbro.com/mahila-sarthi.mytechbro.com", "mahila-sarthi.mytechbro.com"),
       );
 
   Map<String, dynamic> toJson() => {

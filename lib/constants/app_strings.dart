@@ -12,32 +12,32 @@ class AppStrings {
   static String get countryCode => env('country_code');
 
   //
-  static bool get enableOtp => env('enble_otp') == "1";
-  static bool get enableOTPLogin => env('enableOTPLogin') == "1";
-  static bool get enableEmailLogin => env('enableEmailLogin');
-  static bool get enableProfileUpdate => env('enableProfileUpdate');
+  static bool get enableOtp => ["1", 1, "true", true].contains(env('enble_otp'));
+  static bool get enableOTPLogin => ["1", 1, "true", true].contains(env('enableOTPLogin'));
+  static bool get enableEmailLogin => ["1", 1, "true", true].contains(env('enableEmailLogin'));
+  static bool get enableProfileUpdate => ["1", 1, "true", true].contains(env('enableProfileUpdate'));
   //
 
-  static bool get enableProofOfDelivery => env('enableProofOfDelivery') == "1";
+  static bool get enableProofOfDelivery => ["1", 1, "true", true].contains(env('enableProofOfDelivery'));
   static bool get signatureVerify =>
       env('orderVerificationType') == "signature";
   static bool get verifyOrderByPhoto => env('orderVerificationType') == "photo";
-  static bool get enableDriverWallet => env('enableDriverWallet') == "1";
-  static bool get enableChat => env('enableChat') == "1";
+  static bool get enableDriverWallet => ["1", 1, "true", true].contains(env('enableDriverWallet'));
+  static bool get enableChat => ["1", 1, "true", true].contains(env('enableChat'));
   static bool get partnersCanRegister =>
-      ["1", 1].contains(env('partnersCanRegister'));
+      ["1", 1, "true", true].contains(env('partnersCanRegister'));
   static double get driverSearchRadius =>
-      double.parse((env('driverSearchRadius') ?? 10).toString());
+      double.tryParse((env('driverSearchRadius') ?? 10).toString()) ?? 10.0;
   static int get maxDriverOrderAtOnce =>
-      int.parse((env('maxDriverOrderAtOnce') ?? 1).toString());
+      int.tryParse((env('maxDriverOrderAtOnce') ?? 1).toString()) ?? 1;
 
   static double get distanceCoverLocationUpdate =>
-      double.parse((env('distanceCoverLocationUpdate') ?? 10).toString());
+      double.tryParse((env('distanceCoverLocationUpdate') ?? 10).toString()) ?? 10.0;
   static int get timePassLocationUpdate =>
-      int.parse((env('timePassLocationUpdate') ?? 10).toString());
+      int.tryParse((env('timePassLocationUpdate') ?? 10).toString()) ?? 10;
   //
   static int get alertDuration {
-    final duration = env('alertDuration').toString().toInt();
+    final duration = int.tryParse(env('alertDuration').toString());
     if (duration == null || duration < 10) {
       return 10;
     }
@@ -48,24 +48,31 @@ class AppStrings {
     final val = env('autoassignmentsystem');
     print(
         "AppStrings: driverMatchingNewSystem autoassignmentsystem raw value: '$val' (type: ${val.runtimeType})");
-    final isNew = ["1", 1].contains(val);
+    final isNew = ["1", 1, "true", true].contains(val);
     print("AppStrings: driverMatchingNewSystem resolved to: $isNew");
     return isNew;
   }
 
   //
-  static String get otpGateway => env('otpGateway') ?? "none";
+  static String get otpGateway => env('otpGateway')?.toString() ?? "none";
   static bool get isFirebaseOtp => otpGateway.toLowerCase() == "firebase";
   static bool get isCustomOtp =>
       !["none", "firebase"].contains(otpGateway.toLowerCase());
-  static String get emergencyContact => env('emergencyContact') ?? "112";
+  static String get emergencyContact =>
+      LocalStorageService.prefs?.getString('customDriverSOS') ?? "112";
 
   //UI Configures
   static dynamic get uiConfig {
     return env('ui') ?? null;
   }
 
-  static bool get qrcodeLogin => env('auth')['qrcodeLogin'];
+  static bool get qrcodeLogin {
+    final auth = env('auth');
+    if (auth is Map) {
+      return ["1", 1, "true", true].contains(auth['qrcodeLogin']);
+    }
+    return false;
+  }
 
   //DONT'T TOUCH
   static const String notificationChannel = "high_importance_channel";

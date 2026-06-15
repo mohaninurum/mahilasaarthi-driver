@@ -26,7 +26,7 @@ class BackgroundPermissionDialog extends StatelessWidget {
           CustomButton(
             title: "Next".tr(),
             onPressed: () {
-              AppService().navigatorKey.currentContext?.pop(true);
+              Navigator.pop(AppService().navigatorKey.currentContext!, true);
             },
           ).py12(),
           Visibility(
@@ -35,7 +35,7 @@ class BackgroundPermissionDialog extends StatelessWidget {
               title: "Cancel".tr(),
               color: Colors.grey[400],
               onPressed: () {
-                AppService().navigatorKey.currentContext?.pop(false);
+                Navigator.pop(AppService().navigatorKey.currentContext!, false);
               },
             ),
           ),
@@ -44,3 +44,7 @@ class BackgroundPermissionDialog extends StatelessWidget {
     );
   }
 }
+
+
+
+
