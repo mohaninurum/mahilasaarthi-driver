@@ -27,13 +27,21 @@ class _Training_ScreenState extends State<Training_Screen> {
 
 
   Future<void> callApi() async {
-    final response = await get(Uri.parse(Api.baseUrl + "/driverTrainingContent"));
-    isloading = false;
-    if(response.statusCode == 200){
-      final data = jsonDecode(response.body);
-      trainingModelResponse = TrainingModelResponse.fromJson(data);
+    try {
+      final response = await get(Uri.parse(Api.baseUrl + "/driverTrainingContent"));
+      if(response.statusCode == 200){
+        final data = jsonDecode(response.body);
+        trainingModelResponse = TrainingModelResponse.fromJson(data);
+      }
+    } catch (e) {
+      log("Error fetching training content: $e");
+    } finally {
+      if (mounted) {
+        setState(() {
+          isloading = false;
+        });
+      }
     }
-    setState(() {});
   }
 
 @override
@@ -65,6 +73,7 @@ class _Training_ScreenState extends State<Training_Screen> {
       ),
 
       body: Padding(padding: EdgeInsets.symmetric(horizontal: 5,vertical: 15),child:isloading == true ? Center(child: CircularProgressIndicator()):
+      (trainingModelResponse.data == null || trainingModelResponse.data!.isEmpty) ? Center(child: Text("No training content available", style: TextStyle(fontSize: 16))) :
       ListView.builder(
           itemCount: trainingModelResponse.data!.length ,
           itemBuilder: (context, index) {

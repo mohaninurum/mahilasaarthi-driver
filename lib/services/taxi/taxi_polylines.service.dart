@@ -219,12 +219,16 @@ class TaxiPolylinesService {
     CameraUpdate cameraUpdate,
     GoogleMapController mapController,
   ) async {
-    mapController.animateCamera(cameraUpdate);
-    LatLngBounds l1 = await mapController.getVisibleRegion();
-    LatLngBounds l2 = await mapController.getVisibleRegion();
+    try {
+      mapController.animateCamera(cameraUpdate);
+      LatLngBounds l1 = await mapController.getVisibleRegion();
+      LatLngBounds l2 = await mapController.getVisibleRegion();
 
-    if (l1.southwest.latitude == -90 || l2.southwest.latitude == -90) {
-      return checkCameraLocation(cameraUpdate, mapController);
+      if (l1.southwest.latitude == -90 || l2.southwest.latitude == -90) {
+        return checkCameraLocation(cameraUpdate, mapController);
+      }
+    } catch (error) {
+      print("Error checking camera location: $error");
     }
   }
 }

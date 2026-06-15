@@ -73,10 +73,15 @@ class NewTaxiOrderAlertViewModel extends MyBaseViewModel {
   void processOrderAcceptance() async {
     setBusy(true);
     try {
-      final order = await orderRequest.acceptNewOrder(
-        newOrder.id,
-        status: "preparing",
-      );
+      final results = await Future.wait([
+        orderRequest.acceptNewOrder(
+          newOrder.id,
+          status: "preparing",
+        ),
+        // Wait for the swipe animation to finish before disposing
+        Future.delayed(const Duration(milliseconds: 500)),
+      ]);
+      final order = results[0];
       
       orderAlertSubscription?.cancel();
       // Remove from firebase so other drivers don't see it or we don't get it again

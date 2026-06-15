@@ -78,23 +78,27 @@ class OnGoingTaxiBookingService extends TaxiPolylinesService {
     //
     taxiViewModel.notifyListeners();
     //actually zoom now
-    taxiViewModel.taxiGoogleMapManagerService.googleMapController
-        ?.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: point ??
-              LatLng(
-                taxiViewModel.onGoingOrderTrip?.taxiOrder?.pickupLatitude
-                        .toDouble() ??
-                    0.0,
-                taxiViewModel.onGoingOrderTrip?.taxiOrder?.pickupLongitude
-                        .toDouble() ??
-                    0.0,
-              ),
-          zoom: 16,
+    try {
+      taxiViewModel.taxiGoogleMapManagerService.googleMapController
+          ?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: point ??
+                LatLng(
+                  taxiViewModel.onGoingOrderTrip?.taxiOrder?.pickupLatitude
+                          .toDouble() ??
+                      0.0,
+                  taxiViewModel.onGoingOrderTrip?.taxiOrder?.pickupLongitude
+                          .toDouble() ??
+                      0.0,
+                ),
+            zoom: 16,
+          ),
         ),
-      ),
-    );
+      );
+    } catch (error) {
+      print("Error animating camera: $error");
+    }
   }
 
   //Zoom to dropoff location
@@ -119,22 +123,26 @@ class OnGoingTaxiBookingService extends TaxiPolylinesService {
     //
     taxiViewModel.notifyListeners();
     //actually zoom now
-    taxiViewModel.taxiGoogleMapManagerService.googleMapController
-        ?.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(
-            taxiViewModel.onGoingOrderTrip?.taxiOrder?.pickupLatitude
-                    .toDouble() ??
-                0.00,
-            taxiViewModel.onGoingOrderTrip?.taxiOrder?.pickupLongitude
-                    .toDouble() ??
-                0.00,
+    try {
+      taxiViewModel.taxiGoogleMapManagerService.googleMapController
+          ?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(
+              taxiViewModel.onGoingOrderTrip?.taxiOrder?.pickupLatitude
+                      .toDouble() ??
+                  0.00,
+              taxiViewModel.onGoingOrderTrip?.taxiOrder?.pickupLongitude
+                      .toDouble() ??
+                  0.00,
+            ),
+            zoom: 16,
           ),
-          zoom: 16,
         ),
-      ),
-    );
+      );
+    } catch (error) {
+      print("Error animating camera: $error");
+    }
   }
 
   //Zoom to bound within driver location & dropoff location
@@ -336,10 +344,12 @@ class OnGoingTaxiBookingService extends TaxiPolylinesService {
             await taxiViewModel.orderRequest.updateOrder(
           id: taxiViewModel.onGoingOrderTrip!.id,
           status: nextOrderStatus,
-          location: LatLng(
-            currentLocationData?.latitude ?? 0.00,
-            currentLocationData?.longitude ?? 0.00,
-          ),
+          location: currentLocationData != null
+              ? LatLng(
+                  currentLocationData.latitude,
+                  currentLocationData.longitude,
+                )
+              : null,
         );
       } catch (error) {
         taxiViewModel.onGoingOrderTrip =

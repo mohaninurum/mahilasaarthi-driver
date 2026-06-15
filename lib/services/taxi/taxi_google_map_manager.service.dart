@@ -92,14 +92,18 @@ class TaxiGoogleMapManagerService {
 
   //
   zoomToLocation(double lat, double lng) {
-    googleMapController?.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(lat, lng),
-          zoom: 16,
+    try {
+      googleMapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(lat, lng),
+            zoom: 16,
+          ),
         ),
-      ),
-    );
+      );
+    } catch (error) {
+      print("Error animating camera: $error");
+    }
   }
 
   void updateGoogleMapPadding([double? height]) {

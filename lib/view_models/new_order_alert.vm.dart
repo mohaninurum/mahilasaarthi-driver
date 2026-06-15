@@ -58,7 +58,11 @@ class NewOrderAlertViewModel extends MyBaseViewModel {
   void processOrderAcceptance() async {
     setBusy(true);
     try {
-      await orderRequest.acceptNewOrder(newOrder.id!);
+      await Future.wait([
+        orderRequest.acceptNewOrder(newOrder.id!),
+        // Wait for the swipe animation to finish before disposing
+        Future.delayed(const Duration(milliseconds: 500)),
+      ]);
       AppService().stopNotificationSound();
 
       //

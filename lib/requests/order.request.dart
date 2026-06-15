@@ -57,12 +57,16 @@ class OrderRequest extends HttpService {
     String status = "delivered",
     LatLng? location,
   }) async {
+    final Map<String, dynamic> payload = {
+      "status": status,
+    };
+    if (location != null) {
+      payload["latlng"] = "${location.latitude},${location.longitude}";
+    }
+
     final apiResult = await patch(
       Api.orders + "/$id",
-      {
-        "status": status,
-        "latlng": "${location?.latitude},${location?.longitude}"
-      },
+      payload,
     );
     //
     final apiResponse = ApiResponse.fromResponse(apiResult);

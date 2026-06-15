@@ -96,15 +96,19 @@ class TaxiLocationService {
 
   zoomToLocation() async {
     //
-    taxiViewModel!.taxiGoogleMapManagerService.googleMapController
-        ?.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: driverMarker?.position ?? LatLng(0.00, 0.00),
-          zoom: 16,
+    try {
+      taxiViewModel!.taxiGoogleMapManagerService.googleMapController
+          ?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: driverMarker?.position ?? LatLng(0.00, 0.00),
+            zoom: 16,
+          ),
         ),
-      ),
-    );
+      );
+    } catch (error) {
+      print("Error animating camera: $error");
+    }
 
     //
     pauseAutoZoomToLocation();
