@@ -152,26 +152,22 @@ class AuthRequest extends HttpService {
     String? phone,
     bool? isOnline,
   }) async {
-    final apiResult = await postWithFiles(
-      Api.updateProfile,
-      {
-        "_method": "PUT",
-        "name": name,
-        "email": email,
-        "phone": phone,
-        "is_online": isOnline == null
-            ? null
-            : isOnline
-                ? 1
-                : 0,
-        "photo": photo != null
-            ? await MultipartFile.fromFile(
-                photo.path,
-              )
-            : null,
-      },
-    );
-    return ApiResponse.fromResponse(apiResult);
+    Map<String, dynamic> body = {
+      "_method": "PUT",
+    };
+    if (name != null) body["name"] = name;
+    if (email != null) body["email"] = email;
+    if (phone != null) body["phone"] = phone;
+    if (isOnline != null) body["is_online"] = isOnline ? 1 : 0;
+
+    if (photo != null) {
+      body["photo"] = await MultipartFile.fromFile(photo.path);
+      final apiResult = await postWithFiles(Api.updateProfile, body);
+      return ApiResponse.fromResponse(apiResult);
+    } else {
+      final apiResult = await post(Api.updateProfile, body);
+      return ApiResponse.fromResponse(apiResult);
+    }
   }
 
   Future<ApiResponse> updatePassword({

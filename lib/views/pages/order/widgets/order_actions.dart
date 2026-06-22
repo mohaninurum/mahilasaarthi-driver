@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:mahilasaarthi/models/order.dart';
 import 'package:mahilasaarthi/utils/ui_spacer.dart';
 import 'package:mahilasaarthi/views/pages/order/widgets/wallet_transfer.dialog.dart';

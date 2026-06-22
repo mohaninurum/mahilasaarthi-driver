@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:mahilasaarthi/constants/app_images.dart';
 import 'package:mahilasaarthi/services/validator.service.dart';
 import 'package:mahilasaarthi/view_models/edit_profile.vm.dart';

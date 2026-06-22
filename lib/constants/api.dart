@@ -2,12 +2,14 @@
 
 class Api {
   static String get baseUrl {
-    return "https://mahila-sarthi.mytechbro.com/api";
+    return "https://admin.mahilasaarthi.in/api";
+    //return "https://mahila-sarthi.mytechbro.com/api";
     // return "http://192.168.10.6:8000/api";
     //   return "https://mahila.easysoft.pk/api";
   }
 
-  static const driver_traininUri = "https://mahila-sarthi.mytechbro.com/driver_training_contents/";
+  static const driver_traininUri =
+      "https://mahila-sarthi.mytechbro.com/driver_training_contents/";
 
   static const appSettings = "/app/settings";
   static const emergencyContacts = "/app/emergency-contacts";
@@ -30,7 +32,7 @@ class Api {
   static const verifyFirebaseOtp = "/otp/firebase/verify";
 
   static const orders = "/orders";
-  
+
   // Cashfree Verification
   static const generateAadhaarOtp = "/verify/aadhaar/generate-otp";
   static const verifyAadhaarOtp = "/verify/aadhaar/submit-otp";

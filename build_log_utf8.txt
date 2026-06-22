@@ -1,0 +1,164 @@
+﻿flutter : Package file_picker:linux references file_picker:linux as the default plugin, but it does not provide an 
+inline implementation.
+At line:1 char:1
++ flutter build apk --debug > build_log.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Package file_pi...implementation.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Ask the maintainers of file_picker to either avoid referencing a default implementation via `platforms: linux: 
+default_package: file_picker` or add an inline implementation to file_picker via `platforms: linux:` `pluginClass` or 
+`dartPluginClass`.
+
+Package file_picker:macos references file_picker:macos as the default plugin, but it does not provide an inline 
+implementation.
+Ask the maintainers of file_picker to either avoid referencing a default implementation via `platforms: macos: 
+default_package: file_picker` or add an inline implementation to file_picker via `platforms: macos:` `pluginClass` or 
+`dartPluginClass`.
+
+Package file_picker:windows references file_picker:windows as the default plugin, but it does not provide an inline 
+implementation.
+Ask the maintainers of file_picker to either avoid referencing a default implementation via `platforms: windows: 
+default_package: file_picker` or add an inline implementation to file_picker via `platforms: windows:` `pluginClass` 
+or `dartPluginClass`.
+
+Package file_picker:linux references file_picker:linux as the default plugin, but it does not provide an inline 
+implementation.
+Ask the maintainers of file_picker to either avoid referencing a default implementation via `platforms: linux: 
+default_package: file_picker` or add an inline implementation to file_picker via `platforms: linux:` `pluginClass` or 
+`dartPluginClass`.
+
+Package file_picker:macos references file_picker:macos as the default plugin, but it does not provide an inline 
+implementation.
+Ask the maintainers of file_picker to either avoid referencing a default implementation via `platforms: macos: 
+default_package: file_picker` or add an inline implementation to file_picker via `platforms: macos:` `pluginClass` or 
+`dartPluginClass`.
+
+Package file_picker:windows references file_picker:windows as the default plugin, but it does not provide an inline 
+implementation.
+Ask the maintainers of file_picker to either avoid referencing a default implementation via `platforms: windows: 
+default_package: file_picker` or add an inline implementation to file_picker via `platforms: windows:` `pluginClass` 
+or `dartPluginClass`.
+
+Running Gradle task 'assembleDebug'...                          
+Warning: Flutter support for your project's Gradle version (8.7.0) will soon be dropped. Please upgrade your Gradle 
+version to a version of at least 8.14.0 soon.
+Alternatively, use the flag "--android-skip-build-dependency-validation" to bypass this check.
+
+Potential fix: Your project's gradle version is typically defined in the gradle wrapper file. By default, this can be 
+found at D:\InurumFlutter\mg\driver and 
+customer\mahilasaarthi\driver\android/gradle/wrapper/gradle-wrapper.properties. 
+For more information, see https://docs.gradle.org/current/userguide/gradle_wrapper.html.
+
+Warning: Flutter support for your project's Android Gradle Plugin version (Android Gradle Plugin version 8.6.0) will 
+soon be dropped. Please upgrade your Android Gradle Plugin version to a version of at least Android Gradle Plugin 
+version 8.11.1 soon.
+Alternatively, use the flag "--android-skip-build-dependency-validation" to bypass this check.
+
+Potential fix: Your project's AGP version is typically defined in the plugins block of the `settings.gradle` file 
+(D:\InurumFlutter\mg\driver and customer\mahilasaarthi\driver\android/settings.gradle), by a plugin with the id of 
+com.android.application. 
+If you don't see a plugins block, your project was likely created with an older template version. In this case it is 
+most likely defined in the top-level build.gradle file (D:\InurumFlutter\mg\driver and 
+customer\mahilasaarthi\driver\android/build.gradle) by the following line in the dependencies block of the 
+buildscript: "classpath 'com.android.tools.build:gradle:<version>'".
+
+Warning: Flutter support for your project's Kotlin version (2.0.0) will soon be dropped. Please upgrade your Kotlin 
+version to a version of at least 2.2.20 soon.
+Alternatively, use the flag "--android-skip-build-dependency-validation" to bypass this check.
+
+Potential fix: Your project's KGP version is typically defined in the plugins block of the `settings.gradle` file 
+(D:\InurumFlutter\mg\driver and customer\mahilasaarthi\driver\android/settings.gradle), by a plugin with the id of 
+org.jetbrains.kotlin.android. 
+If you don't see a plugins block, your project was likely created with an older template version, in which case it is 
+most likely defined in the top-level build.gradle file (D:\InurumFlutter\mg\driver and 
+customer\mahilasaarthi\driver\android/build.gradle) by the ext.kotlin_version property.
+
+WARNING: Your Android app project: app located at: D:\InurumFlutter\mg\driver and 
+customer\mahilasaarthi\driver\android\app\build.gradle
+applies the Kotlin Gradle Plugin, which will cause build failures in future versions of Flutter. 
+Please migrate your app to Built-in Kotlin using this guide: 
+https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-app-developers
+
+WARNING: Your app uses the following plugins that apply Kotlin Gradle Plugin (KGP): assets_audio_player, 
+assets_audio_player_web, device_info_plus, fl_location, flutter_image_compress, fluttertoast, in_app_review, 
+map_launcher, package_info_plus, phonepe_payment_sdk, qr_code_scanner, swipe_button_widget, wakelock_plus
+Future versions of Flutter will fail to build if your app uses plugins that apply KGP.
+
+Please check the changelogs of these plugins and upgrade to a version that supports Built-in Kotlin.
+If no such version exists, report the issue to the plugin. If necessary, here is a guide on filing 
+an issue against a plugin: https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-app-develop
+ers#report-incompatible-kotlin-gradle-plugin-usage-to-plugin-authors
+
+If you are a plugin author, please migrate your plugin to Built-in Kotlin using this guide: 
+https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-plugin-authors
+/C:/Users/Inurum_Four/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_icons_null_safety-1.1.0/lib/src/flutter_icon_data.
+dart:4:31: Error: The class 'IconData' can't be extended outside of its library because it's a final class.
+class FlutterIconData extends IconData {
+                              ^
+Target kernel_snapshot_program failed: Exception
+
+
+FAILURE: Build completed with 2 failures.
+
+1: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':app:checkDebugAarMetadata'.
+> A failure occurred while executing com.android.build.gradle.internal.tasks.CheckAarMetadataWorkAction
+   > 7 issues were found when checking AAR metadata:
+
+       1.  Dependency ':qr_code_scanner' requires core library desugaring to be enabled
+           for :app.
+
+           See https://developer.android.com/studio/write/java8-support.html for more
+           details.
+
+       2.  Dependency 'androidx.browser:browser:1.9.0' requires Android Gradle plugin 8.9.1 or higher.
+
+           This build currently uses Android Gradle plugin 8.6.0.
+
+       3.  Dependency 'androidx.activity:activity-ktx:1.12.4' requires Android Gradle plugin 8.9.1 or higher.
+
+           This build currently uses Android Gradle plugin 8.6.0.
+
+       4.  Dependency 'androidx.activity:activity:1.12.4' requires Android Gradle plugin 8.9.1 or higher.
+
+           This build currently uses Android Gradle plugin 8.6.0.
+
+       5.  Dependency 'androidx.navigationevent:navigationevent-android:1.0.2' requires Android Gradle plugin 8.9.1 or 
+higher.
+
+           This build currently uses Android Gradle plugin 8.6.0.
+
+       6.  Dependency 'androidx.core:core-ktx:1.18.0' requires Android Gradle plugin 8.9.1 or higher.
+
+           This build currently uses Android Gradle plugin 8.6.0.
+
+       7.  Dependency 'androidx.core:core:1.18.0' requires Android Gradle plugin 8.9.1 or higher.
+
+           This build currently uses Android Gradle plugin 8.6.0.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+2: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':app:compileFlutterBuildDebug'.
+> Process 'command 'C:\src\flutter\bin\flutter.bat'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+BUILD FAILED in 8s
+Running Gradle task 'assembleDebug'...                              9.4s
+Gradle task assembleDebug failed with exit code 1

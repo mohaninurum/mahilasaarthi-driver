@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:mahilasaarthi/constants/app_colors.dart';
 import 'package:mahilasaarthi/constants/app_strings.dart';
 import 'package:mahilasaarthi/extensions/dynamic.dart';
@@ -8,7 +8,7 @@ import 'package:mahilasaarthi/utils/utils.dart';
 import 'package:mahilasaarthi/widgets/currency_hstack.dart';
 import 'package:intl/intl.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:timelines/timelines.dart';
+import 'package:timelines_plus/timelines_plus.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class BasicTaxiTripInfoView extends StatelessWidget {

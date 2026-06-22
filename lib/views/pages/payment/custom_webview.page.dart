@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:mahilasaarthi/services/app.service.dart';
 import 'package:mahilasaarthi/widgets/base.page.dart';

@@ -89,7 +89,8 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
 
   void processOTPLogin() async {
     //
-    accountPhoneNumber = Utils.getFormattedPhoneNumber(phoneTEC.text, selectedCountry.phoneCode);
+    accountPhoneNumber =
+        Utils.getFormattedPhoneNumber(phoneTEC.text, selectedCountry.phoneCode);
     // Validate returns true if the form is valid, otherwise false.
     if (formKey.currentState!.validate()) {
       setBusyForObject(otpLogin, true);
@@ -159,7 +160,8 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
     try {
       final apiResponse = await authRequest.sendOTP(accountPhoneNumber!);
       setBusyForObject(otpLogin, false);
-      showVerificationEntry(apiResponse.body?['otp_code']?.toString());
+      print("OTP Code received from API (for dev purposes): ${apiResponse.body?['otp_code']}");
+      showVerificationEntry(); // Removed auto-fill to force manual entry
     } catch (error) {
       setBusyForObject(otpLogin, false);
       viewContext.showToast(msg: "$error", bgColor: Colors.red);
@@ -171,36 +173,38 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
     //
     setBusy(false);
     //
-    await Navigator.push(viewContext, MaterialPageRoute(builder: 
-      (context) => AccountVerificationEntry(
-        vm: this,
-        phone: accountPhoneNumber!,
-        otpCode: otpCode,
-        onSubmit: (smsCode) {
-          //
-          if (AppStrings.isFirebaseOtp) {
-            verifyFirebaseOTP(smsCode);
-          } else {
-            verifyCustomOTP(smsCode);
-          }
-
-          Navigator.pop(viewContext);
-        },
-        onResendCode: AppStrings.isCustomOtp
-            ? () async {
-                try {
-                  final response =
-                      await authRequest.sendOTP(accountPhoneNumber!);
-                  toastSuccessful(response.message ?? "Success".tr());
-                } catch (error) {
-                  viewContext.showToast(msg: "$error", bgColor: Colors.red);
-                }
+    await Navigator.push(
+        viewContext,
+        MaterialPageRoute(
+          builder: (context) => AccountVerificationEntry(
+            vm: this,
+            phone: accountPhoneNumber!,
+            otpCode: otpCode,
+            onSubmit: (smsCode) {
+              //
+              if (AppStrings.isFirebaseOtp) {
+                verifyFirebaseOTP(smsCode);
+              } else {
+                verifyCustomOTP(smsCode);
               }
-            : () async {
-                await processFirebaseOTPVerification();
-              },
-      ),
-    ));
+
+              Navigator.pop(viewContext);
+            },
+            onResendCode: AppStrings.isCustomOtp
+                ? () async {
+                    try {
+                      final response =
+                          await authRequest.sendOTP(accountPhoneNumber!);
+                      toastSuccessful(response.message ?? "Success".tr());
+                    } catch (error) {
+                      viewContext.showToast(msg: "$error", bgColor: Colors.red);
+                    }
+                  }
+                : () async {
+                    await processFirebaseOTPVerification();
+                  },
+          ),
+        ));
   }
 
   //
@@ -256,7 +260,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         authCredential,
       );
       //
-      String firebaseToken = await userCredential.user!.getIdToken();
+      String firebaseToken = (await userCredential.user!.getIdToken()) ?? "";
       final apiResponse = await authRequest.verifyFirebaseToken(
         accountPhoneNumber!,
         firebaseToken,
@@ -364,8 +368,3 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
     // openExternalWebpageLink(url);
   }
 }
-
-
-
-
-

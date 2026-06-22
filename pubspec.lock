@@ -58,13 +58,12 @@ packages:
     source: hosted
     version: "3.0.6"
   assets_audio_player_web:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: assets_audio_player_web
-      sha256: "4575ec40033d818ff022d48f7d46e24c01bc632bd1cd36a4f8b58b38e9aa4a81"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.6"
+      path: "packages/assets_audio_player_web"
+      relative: true
+    source: path
+    version: "3.1.1"
   async:
     dependency: transitive
     description:
@@ -703,6 +702,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.0"
+  flutter_font_icons:
+    dependency: "direct main"
+    description:
+      name: flutter_font_icons
+      sha256: d06eb0ab903d0e90a9a758de30892ea0d43221f03dad059970384e62479c787e
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.7"
   flutter_form_builder:
     dependency: "direct main"
     description:
@@ -711,14 +718,12 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.7.0"
-  flutter_icons:
+  flutter_icons_null_safety:
     dependency: "direct main"
     description:
-      path: "."
-      ref: dart-3
-      resolved-ref: c83e143e940e2ed400b0201a5d8c97cf3bacabc3
-      url: "https://github.com/imclerran/flutter-icons.git"
-    source: git
+      path: "packages/flutter_icons_null_safety"
+      relative: true
+    source: path
     version: "1.1.0"
   flutter_image_compress:
     dependency: "direct main"
@@ -1988,14 +1993,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.3"
-  timelines:
+  timelines_plus:
     dependency: "direct main"
     description:
-      name: timelines
-      sha256: "40214f5ab772ff45459cb8c15e5f60505a6828af0c0eb1eec6f29ed911a4c1c5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.0"
+      path: "packages/timelines_plus"
+      relative: true
+    source: path
+    version: "1.0.8"
   translator:
     dependency: "direct dev"
     description:

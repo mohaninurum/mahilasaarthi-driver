@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:mahilasaarthi/models/vehicle.dart';
 import 'package:mahilasaarthi/widgets/custom_image.view.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';

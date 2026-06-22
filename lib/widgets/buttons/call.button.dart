@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:mahilasaarthi/constants/app_colors.dart';
 import 'package:mahilasaarthi/models/vendor.dart';
 import 'package:url_launcher/url_launcher_string.dart';

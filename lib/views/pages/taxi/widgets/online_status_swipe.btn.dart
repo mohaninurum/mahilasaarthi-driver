@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:mahilasaarthi/services/alert.service.dart';
 import 'package:mahilasaarthi/view_models/taxi/taxi.vm.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
@@ -23,79 +23,41 @@ class _OnlineStatusSwipeButtonState extends State<OnlineStatusSwipeButton> {
   Widget build(BuildContext context) {
     final driverIsOnline = widget.vm.appService.driverIsOnline;
     //
-    return SwipeButtonWidget(
-        key: viewKey,
-        acceptPoitTransition: 0.7,
-        margin: const EdgeInsets.all(0),
-        padding: const EdgeInsets.all(0),
-        boxShadow: [],
-        borderRadius: BorderRadius.circular(0),
-        colorBeforeSwipe: driverIsOnline ? Colors.red : Colors.green,
-        colorAfterSwiped: driverIsOnline ? Colors.red : Colors.green,
-        height: 50,
-        childBeforeSwipe: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(0),
-            color: driverIsOnline ? Colors.red : Colors.green,
-          ),
-          width: 100,
-          height: double.infinity,
-          child: const Center(
+    return VxBox(
+      child: HStack(
+        [
+          VxBox(
             child: Icon(
-              FlutterIcons.chevrons_right_fea,
+              driverIsOnline ? FlutterIcons.close_ant : FlutterIcons.chevrons_right_fea,
               color: Colors.white,
               size: 34,
-            ),
-          ),
-        ),
-        childAfterSwiped: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(0),
-            color: driverIsOnline ? Colors.red : Colors.green,
-          ),
-          width: 70,
-          height: double.infinity,
-          child: const Center(
-            child: Icon(
-              FlutterIcons.check_ant,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        leftChildren: [
-          Align(
-            alignment: Alignment(0.9, 0),
-            child: (driverIsOnline ? "Go offline" : "Go online")
-                .tr()
-                .text
-                .extraBold
-                .xl2
-                .white
-                .make(),
-          )
+            ).centered(),
+          ).width(100).make(),
+          Spacer(),
+          (driverIsOnline ? "Go offline" : "Go online")
+              .tr()
+              .text
+              .extraBold
+              .xl2
+              .white
+              .make()
+              .px(16),
         ],
-        onHorizontalDragUpdate: (e) {},
-        onHorizontalDragRight: (e) async {
-          bool result = false;
-          AlertService.showLoading();
-          try {
-            final newDriverState = !widget.vm.appService.driverIsOnline;
-            //show loading
-            await widget.vm.newTaxiBookingService
-                .toggleVisibility(newDriverState);
-
-            setState(() {
-              viewKey = new ObjectKey(DateTime.now());
-            });
-            result = true;
-          } catch (error) {
-            widget.vm.toastError("$error");
-          }
-          AlertService.stopLoading();
-          return result;
-        },
-        onHorizontalDragleft: (e) async {
-          return false;
-        }).h(widget.vm.isBusy ? 0 : 60);
+      ),
+    )
+    .color(driverIsOnline ? Colors.red : Colors.green)
+    .make()
+    .h(50)
+    .onInkTap(() async {
+      await Future.delayed(const Duration(milliseconds: 500));
+      try {
+        final newDriverState = !widget.vm.appService.driverIsOnline;
+        await widget.vm.newTaxiBookingService.toggleVisibility(newDriverState, showLoading: true);
+        setState(() {});
+      } catch (error) {
+        widget.vm.toastError("$error");
+      }
+    })
+    .h(widget.vm.isBusy ? 0 : 60);
   }
 }

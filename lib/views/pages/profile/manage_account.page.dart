@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:mahilasaarthi/utils/ui_spacer.dart';
 import 'package:mahilasaarthi/view_models/profile.vm.dart';
 import 'package:mahilasaarthi/widgets/base.page.dart';

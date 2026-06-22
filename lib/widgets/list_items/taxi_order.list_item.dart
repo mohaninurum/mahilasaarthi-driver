@@ -1,6 +1,6 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:mahilasaarthi/constants/app_colors.dart';
 import 'package:mahilasaarthi/constants/app_images.dart';
 import 'package:mahilasaarthi/constants/app_strings.dart';

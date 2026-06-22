@@ -7,6 +7,7 @@ import 'package:mahilasaarthi/services/appbackground.service.dart';
 import 'package:mahilasaarthi/services/order_assignment.service.dart';
 import 'package:mahilasaarthi/services/taxi_background_order.service.dart';
 import 'package:mahilasaarthi/view_models/taxi/taxi.vm.dart';
+import 'package:mahilasaarthi/services/alert.service.dart';
 
 class NewTaxiBookingService {
   TaxiViewModel taxiViewModel;
@@ -27,15 +28,17 @@ class NewTaxiBookingService {
   }
 
   //
-  toggleVisibility(bool value) async {
+  toggleVisibility(bool value, {bool showLoading = false}) async {
     //
+    if (showLoading) AlertService.showLoading();
     taxiViewModel.appService.driverIsOnline = value;
     final updated = await taxiViewModel.syncDriverNewState();
+    if (showLoading) AlertService.stopLoading();
     //
     if (updated) {
       if (value && taxiViewModel.onGoingOrderTrip == null) {
         startNewOrderListener();
-        AppbackgroundService().startBg();
+        await AppbackgroundService().startBg();
       } else {
         stopListeningToNewOrder();
         AppbackgroundService().stopBg();

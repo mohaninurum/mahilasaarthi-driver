@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:mahilasaarthi/models/traningModel.dart';
 import 'package:mahilasaarthi/widgets/imagePreview.dart';
 import 'package:open_file_plus/open_file_plus.dart';
