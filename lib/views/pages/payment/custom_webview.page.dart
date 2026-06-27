@@ -31,20 +31,15 @@ class _CustomWebviewPageState extends State<CustomWebviewPage> {
   bool isLoading = false;
   final GlobalKey webViewKey = GlobalKey();
   InAppWebViewController? webViewController;
-  InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
-      crossPlatform: InAppWebViewOptions(
-        useShouldOverrideUrlLoading: true,
-        mediaPlaybackRequiresUserGesture: false,
-        clearCache: true,
-        cacheEnabled: false,
-      ),
-      android: AndroidInAppWebViewOptions(
-        useHybridComposition: true,
-        clearSessionCache: true,
-      ),
-      ios: IOSInAppWebViewOptions(
-        allowsInlineMediaPlayback: true,
-      ));
+  InAppWebViewSettings options = InAppWebViewSettings(
+    useShouldOverrideUrlLoading: true,
+    mediaPlaybackRequiresUserGesture: false,
+    clearCache: true,
+    cacheEnabled: false,
+    useHybridComposition: true,
+    clearSessionCache: true,
+    allowsInlineMediaPlayback: true,
+  );
 
   PullToRefreshController? pullToRefreshController;
   String url = "";
@@ -59,7 +54,7 @@ class _CustomWebviewPageState extends State<CustomWebviewPage> {
 
     //
     pullToRefreshController = PullToRefreshController(
-      options: PullToRefreshOptions(
+      settings: PullToRefreshSettings(
         color: Colors.blue,
       ),
       onRefresh: () async {
@@ -161,8 +156,8 @@ class _CustomWebviewPageState extends State<CustomWebviewPage> {
           //page
           InAppWebView(
             key: webViewKey,
-            initialUrlRequest: URLRequest(url: Uri.parse(selectedUrl)),
-            initialOptions: options,
+            initialUrlRequest: URLRequest(url: WebUri(selectedUrl)),
+            initialSettings: options,
             pullToRefreshController: pullToRefreshController,
             onWebViewCreated: (controller) {
               webViewController = controller;
@@ -174,10 +169,10 @@ class _CustomWebviewPageState extends State<CustomWebviewPage> {
                 urlController.text = this.url;
               });
             },
-            androidOnPermissionRequest: (controller, origin, resources) async {
-              return PermissionRequestResponse(
-                resources: resources,
-                action: PermissionRequestResponseAction.GRANT,
+            onPermissionRequest: (controller, request) async {
+              return PermissionResponse(
+                resources: request.resources,
+                action: PermissionResponseAction.GRANT,
               );
             },
             shouldOverrideUrlLoading: (controller, navigationAction) async {

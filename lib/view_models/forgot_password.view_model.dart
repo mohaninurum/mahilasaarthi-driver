@@ -135,7 +135,7 @@ class ForgotPasswordViewModel extends MyBaseViewModel {
     try {
       final response = await _authRequest.sendOTP(phoneNumber);
       setBusy(false);
-      showVerificationEntry(response.body?['otp_code']?.toString());
+      showVerificationEntry();
     } catch (error) {
       setBusy(false);
       viewContext.showToast(msg: "$error", bgColor: Colors.red);

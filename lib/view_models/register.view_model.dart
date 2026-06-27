@@ -236,7 +236,7 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
     try {
       final response = await _authRequest.sendOTP(accountPhoneNumber!);
       setBusy(false);
-      showVerificationEntry(response.body?['otp_code']?.toString());
+      showVerificationEntry();
     } catch (error) {
       setBusy(false);
       toastError("$error");
@@ -252,13 +252,17 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
             vm: this,
             phone: accountPhoneNumber!,
             otpCode: otpCode,
-            onSubmit: (smsCode) {
+            onSubmit: (smsCode) async {
+              bool success = false;
               if (AppStrings.isFirebaseOtp) {
-                verifyFirebaseOTP(smsCode);
+                success = await verifyFirebaseOTP(smsCode);
               } else {
-                verifyCustomOTP(smsCode);
+                success = await verifyCustomOTP(smsCode);
               }
-              Navigator.pop(viewContext);
+              if (success) {
+                Navigator.pop(viewContext);
+                startAadhaarVerification();
+              }
             },
             onResendCode: AppStrings.isCustomOtp
                 ? () async {
@@ -277,7 +281,7 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         ));
   }
 
-  void verifyFirebaseOTP(String smsCode) async {
+  Future<bool> verifyFirebaseOTP(String smsCode) async {
     setBusy(true);
     try {
       PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.credential(
@@ -287,14 +291,15 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential);
       firebaseToken = await userCredential.user?.getIdToken();
-      await startAadhaarVerification();
+      return true;
     } catch (error) {
       setBusy(false);
       toastError("$error");
+      return false;
     }
   }
 
-  void verifyCustomOTP(String smsCode) async {
+  Future<bool> verifyCustomOTP(String smsCode) async {
     setBusy(true);
     try {
       final apiResponse = await _authRequest.verifyOTP(
@@ -303,10 +308,11 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         isLogin: false,
       );
       firebaseToken = apiResponse.body["token"];
-      await startAadhaarVerification();
+      return true;
     } catch (error) {
       setBusy(false);
       toastError("$error");
+      return false;
     }
   }
 
@@ -338,10 +344,12 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
               child: Text("Cancel".tr()),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (aadhaarTEC.text.length == 12) {
-                  Navigator.pop(context);
-                  submitAadhaarNumber(aadhaarTEC.text);
+                  bool success = await submitAadhaarNumber(aadhaarTEC.text);
+                  if (success) {
+                    Navigator.pop(context);
+                  }
                 } else {
                   toastError("Enter valid 12 digit Aadhaar".tr());
                 }
@@ -354,7 +362,7 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
     );
   }
 
-  Future<void> submitAadhaarNumber(String aadhaar) async {
+  Future<bool> submitAadhaarNumber(String aadhaar) async {
     setBusy(true);
     try {
       final response = await _authRequest.generateAadhaarOtp(aadhaar);
@@ -362,19 +370,17 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         aadhaarNumber = aadhaar;
         aadhaarRefId = response.body['ref_id'];
         setBusy(false);
-        String? otpCode = response.body['otp']?.toString() ?? response.body['otp_code']?.toString();
-        if (otpCode != null && otpCode.length == 6) {
-          submitAadhaarOtp(otpCode);
-        } else {
-          showAadhaarOtpEntry(otpCode);
-        }
+        showAadhaarOtpEntry();
+        return true;
       } else {
         toastError(response.body['message'] ?? "Aadhaar API Error");
         setBusy(false);
+        return false;
       }
     } catch (e) {
       toastError(e.toString());
       setBusy(false);
+      return false;
     }
   }
 
@@ -400,10 +406,12 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
               child: Text("Cancel".tr()),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (otpTEC.text.length == 6) {
-                  Navigator.pop(context);
-                  submitAadhaarOtp(otpTEC.text);
+                  bool success = await submitAadhaarOtp(otpTEC.text);
+                  if (success) {
+                    Navigator.pop(context);
+                  }
                 } else {
                   toastError("Enter valid OTP".tr());
                 }
@@ -416,8 +424,8 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
     );
   }
 
-  Future<void> submitAadhaarOtp(String otp) async {
-    if (aadhaarRefId == null) return;
+  Future<bool> submitAadhaarOtp(String otp) async {
+    if (aadhaarRefId == null) return false;
     setBusy(true);
     try {
       final response = await _authRequest.verifyAadhaarOtp(aadhaarRefId!, otp);
@@ -450,20 +458,23 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
               );
             },
           );
-          return;
+          return true;
         }
 
         toastSuccessful("Aadhaar Verified Successfully!".tr());
         setBusy(false);
         // Step 3: Face Liveness
         startFaceLivenessCheck();
+        return true;
       } else {
         toastError(response.body['message'] ?? "Invalid Aadhaar OTP");
         setBusy(false);
+        return false;
       }
     } catch (e) {
       toastError(e.toString());
       setBusy(false);
+      return false;
     }
   }
 

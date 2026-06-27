@@ -21,8 +21,8 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   }
 
   @override
-  void onCompletedInitialLoad() {
-    print("ChromeSafari browser initial load completed");
+  void onCompletedInitialLoad(bool? didLoadSuccessfully) {
+    print("ChromeSafari browser initial load completed: $didLoadSuccessfully");
   }
 
   @override

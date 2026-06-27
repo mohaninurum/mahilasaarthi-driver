@@ -1,0 +1,122 @@
+Flutter crash report.
+Please report a bug at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter build apk --release
+
+## exception
+
+ProcessException: ProcessException: Process exited abnormally with exit code 1:
+
+[Incubating] Problems report is available at: file:///D:/InurumFlutter/mg/driver%20and%20customer/mahilasaarthi/driver/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Cannot locate tasks that match 'app:tasks' as project 'app' not found in root project 'android'.
+
+* Try:
+> Run gradlew projects to get a list of available projects.
+> For more on name expansion, please refer to https://docs.gradle.org/8.14/userguide/command_line_interface.html#sec:name_abbreviation in the Gradle documentation.
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 740ms
+  Command: D:\InurumFlutter\mg\driver and customer\mahilasaarthi\driver\android\gradlew.bat app:tasks --all --console=auto
+
+```
+#0      RunResult.throwException (package:flutter_tools/src/base/process.dart:153:5)
+#1      _DefaultProcessUtils.run (package:flutter_tools/src/base/process.dart:379:19)
+<asynchronous suspension>
+#2      flavorUndefinedHandler.<anonymous closure> (package:flutter_tools/src/android/gradle_errors.dart:232:38)
+<asynchronous suspension>
+#3      AndroidGradleBuilder._runGradleTask (package:flutter_tools/src/android/gradle.dart:376:40)
+<asynchronous suspension>
+#4      AndroidGradleBuilder.buildGradleApp (package:flutter_tools/src/android/gradle.dart:572:26)
+<asynchronous suspension>
+#5      AndroidGradleBuilder.buildApk (package:flutter_tools/src/android/gradle.dart:236:5)
+<asynchronous suspension>
+#6      BuildApkCommand.runCommand (package:flutter_tools/src/commands/build_apk.dart:132:5)
+<asynchronous suspension>
+#7      FlutterCommand.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command.dart:1630:27)
+<asynchronous suspension>
+#8      AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+<asynchronous suspension>
+#9      CommandRunner.runCommand (package:args/command_runner.dart:212:13)
+<asynchronous suspension>
+#10     FlutterCommandRunner.runCommand.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:496:9)
+<asynchronous suspension>
+#11     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+<asynchronous suspension>
+#12     FlutterCommandRunner.runCommand (package:flutter_tools/src/runner/flutter_command_runner.dart:431:5)
+<asynchronous suspension>
+#13     FlutterCommandRunner.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:307:33)
+<asynchronous suspension>
+#14     run.<anonymous closure>.<anonymous closure> (package:flutter_tools/runner.dart:104:11)
+<asynchronous suspension>
+#15     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+<asynchronous suspension>
+#16     main (package:flutter_tools/executable.dart:103:3)
+<asynchronous suspension>
+```
+
+## flutter doctor
+
+```
+[32m[✓][39m Flutter (Channel stable, 3.44.0, on Microsoft Windows [Version 10.0.26200.8246], locale en-IN) [344ms]
+    [32m•[39m Flutter version 3.44.0 on channel stable at C:\src\flutter
+    [32m•[39m Upstream repository https://github.com/flutter/flutter.git
+    [32m•[39m Framework revision 559ffa3f75 (6 weeks ago), 2026-05-15 14:13:13 -0700
+    [32m•[39m Engine revision 4c525dac5e
+    [32m•[39m Dart version 3.12.0
+    [32m•[39m DevTools version 2.57.0
+    [32m•[39m Feature flags: enable-web, enable-linux-desktop, enable-macos-desktop, enable-windows-desktop, enable-android, enable-ios,
+      cli-animations, enable-native-assets, enable-swift-package-manager, omit-legacy-version-file, enable-lldb-debugging,
+      enable-uiscene-migration
+
+[32m[✓][39m Windows Version (Windows 11 or higher, 25H2, 2009) [796ms]
+
+[33m[!][39m Android toolchain - develop for Android devices (Android SDK version 36.1.0) [1,629ms]
+    [32m•[39m Android SDK at C:\Users\Inurum_Four\AppData\Local\Android\sdk
+    [32m•[39m Emulator version 36.3.10.0 (build_id 14472402) (CL:N/A)
+    [32m•[39m Platform android-36, build-tools 36.1.0
+    [32m•[39m Java binary at: C:\Program Files\Java\jdk-17\bin\java
+      This JDK is specified in your Flutter configuration.
+      To change the current JDK, run: `flutter config --jdk-dir="path/to/jdk"`.
+    [32m•[39m Java version Java(TM) SE Runtime Environment (build 17.0.12+8-LTS-286)
+    [33m![39m Some Android licenses not accepted. To resolve this, run: flutter doctor --android-licenses
+
+[32m[✓][39m Chrome - develop for the web [194ms]
+    [32m•[39m Chrome at C:\Program Files\Google\Chrome\Application\chrome.exe
+
+[33m[!][39m Visual Studio - develop Windows apps (Visual Studio Community 2026 18.2.1) [193ms]
+    [32m•[39m Visual Studio at C:\Program Files\Microsoft Visual Studio\18\Community
+    [32m•[39m Visual Studio Community 2026 version 18.2.11415.280
+    [31m✗[39m Visual Studio is missing necessary components. Please re-run the Visual Studio installer for the "Desktop development with C++" workload,
+      and include these components:
+        MSVC v142 - VS 2019 C++ x64/x86 build tools
+         - If there are multiple build tool versions available, install the latest
+        C++ CMake tools for Windows
+        Windows 10 SDK
+
+[32m[✓][39m Connected device (4 available) [317ms]
+    [32m•[39m moto g32 (mobile) • ZD222CMWMS • android-arm64  • Android 13 (API 33)
+    [32m•[39m Windows (desktop) • windows    • windows-x64    • Microsoft Windows [Version 10.0.26200.8246]
+    [32m•[39m Chrome (web)      • chrome     • web-javascript • Google Chrome 149.0.7827.115
+    [32m•[39m Edge (web)        • edge       • web-javascript • Microsoft Edge 149.0.4022.80
+
+[32m[✓][39m Network resources [840ms]
+    [32m•[39m All expected network resources are available.
+
+[33m![39m Doctor found issues in 2 categories.
+```

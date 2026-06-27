@@ -180,15 +180,13 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
             vm: this,
             phone: accountPhoneNumber!,
             otpCode: otpCode,
-            onSubmit: (smsCode) {
+            onSubmit: (smsCode) async {
               //
               if (AppStrings.isFirebaseOtp) {
-                verifyFirebaseOTP(smsCode);
+                await verifyFirebaseOTP(smsCode);
               } else {
-                verifyCustomOTP(smsCode);
+                await verifyCustomOTP(smsCode);
               }
-
-              Navigator.pop(viewContext);
             },
             onResendCode: AppStrings.isCustomOtp
                 ? () async {
@@ -208,7 +206,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
   }
 
   //
-  void verifyFirebaseOTP(String smsCode) async {
+  Future<void> verifyFirebaseOTP(String smsCode) async {
     //
     setBusyForObject(otpLogin, true);
 
@@ -229,7 +227,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
     setBusyForObject(otpLogin, false);
   }
 
-  void verifyCustomOTP(String smsCode) async {
+  Future<void> verifyCustomOTP(String smsCode) async {
     //
     setBusy(true);
     // Sign the user in (or link) with the credential
@@ -250,7 +248,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
   }
 
   //Login to with firebase token
-  finishOTPLogin(AuthCredential authCredential) async {
+  Future<void> finishOTPLogin(AuthCredential authCredential) async {
     //
     setBusyForObject(otpLogin, true);
     // Sign the user in (or link) with the credential

@@ -24,7 +24,7 @@ class AccountDeletePage extends StatelessWidget {
       builder: (context, vm, child) {
         return BasePage(
           showAppBar: true,
-          showLeadingAction: Navigator.canPop(context),
+          showLeadingAction: AuthServices.currentUser?.deleteRequest == true ? false : Navigator.canPop(context),
           elevation: 0,
           title: "Request Account Deletion".tr(),
           appBarItemColor: Utils.textColorByTheme(),

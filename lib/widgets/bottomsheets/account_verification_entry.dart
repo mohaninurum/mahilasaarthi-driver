@@ -38,29 +38,12 @@ class _AccountVerificationEntryState extends State<AccountVerificationEntry> {
   int resendSecs = 20;
   int resendSecsIncreamental = 5;
   int maxResendSeconds = 30;
-  bool loading = false;
+  bool isVerifying = false;
+  bool isResending = false;
 
   @override
   void initState() {
     super.initState();
-    if (widget.otpCode != null && widget.otpCode!.isNotEmpty) {
-      pinTEC.text = widget.otpCode!;
-      smsCode = widget.otpCode;
-      
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (smsCode != null && smsCode!.length == 6) {
-          setState(() {
-            loading = true;
-          });
-          widget.onSubmit(smsCode!);
-          if (mounted) {
-            setState(() {
-              loading = false;
-            });
-          }
-        }
-      });
-    }
     //
     startCountDown();
   }
@@ -161,7 +144,7 @@ class _AccountVerificationEntryState extends State<AccountVerificationEntry> {
             [
               //resend btn
               CustomOutlineButton(
-                loading: loading,
+                loading: isResending,
                 title: resendSecs > 0
                     ? ("Resend in".tr() + " $resendSecs " + "sec".tr())
                     : ("Resend".tr()),
@@ -175,7 +158,7 @@ class _AccountVerificationEntryState extends State<AccountVerificationEntry> {
                 onPressed: resendSecs <= 0
                     ? () async {
                         setState(() {
-                          loading = true;
+                          isResending = true;
                         });
                         //custom otp
                         if (widget.onResendCode != null) {
@@ -189,7 +172,7 @@ class _AccountVerificationEntryState extends State<AccountVerificationEntry> {
 
                         if (mounted) {
                           setState(() {
-                            loading = false;
+                            isResending = false;
                             resendSecs = maxResendSeconds;
                             maxResendSeconds += resendSecsIncreamental;
                           });
@@ -217,21 +200,19 @@ class _AccountVerificationEntryState extends State<AccountVerificationEntry> {
 
           CustomButton(
             title: "Verify".tr(),
-            loading: loading ||
-                widget.vm.busy(widget.vm.otpLogin) ||
-                widget.vm.isBusy,
+            loading: isVerifying,
             onPressed: () async {
               //
               if (smsCode == null || smsCode!.length != 6) {
                 widget.vm.toastError("Verification code required".tr());
               } else {
                 setState(() {
-                  loading = true;
+                  isVerifying = true;
                 });
                 await widget.onSubmit(smsCode!);
                 if (mounted) {
                   setState(() {
-                    loading = false;
+                    isVerifying = false;
                   });
                 }
               }
@@ -256,16 +237,16 @@ class _AccountVerificationEntryState extends State<AccountVerificationEntry> {
                 Visibility(
                   visible: resendSecs == 0,
                   child: CustomTextButton(
-                    loading: loading,
+                    loading: isResending,
                     title: "Resend".tr(),
                     onPressed: () async {
                       setState(() {
-                        loading = true;
+                        isResending = true;
                       });
                       await widget.onResendCode!();
                       if (mounted) {
                         setState(() {
-                          loading = false;
+                          isResending = false;
                           resendSecs = maxResendSeconds;
                         });
                       }

@@ -4,6 +4,7 @@ import 'package:mahilasaarthi/view_models/base.view_model.dart';
 import 'package:mahilasaarthi/requests/auth.request.dart';
 import 'package:mahilasaarthi/views/pages/splash.page.dart';
 import 'package:velocity_x/velocity_x.dart';
+import 'package:mahilasaarthi/views/pages/shared/home.page.dart';
 
 class AccountDeleteViewModel extends MyBaseViewModel {
   //
@@ -32,7 +33,7 @@ class AccountDeleteViewModel extends MyBaseViewModel {
             AuthServices.currentUser!.deleteRequest = true;
             await AuthServices.saveUser(AuthServices.currentUser!.toJson());
           }
-          notifyListeners();
+          viewContext.nextAndRemoveUntilPage(HomePage());
         } else {
           toastError("${apiResponse.message}");
         }
