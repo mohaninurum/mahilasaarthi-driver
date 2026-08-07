@@ -56,8 +56,32 @@ class SplashViewModel extends MyBaseViewModel {
       await updateAppTheme(appSettingsObject.body["colors"]);
       loadNextPage();
     } catch (error) {
-      setError(error);
       print("Error loading app settings ==> $error");
+      // Show a user-friendly message on timeout / no internet
+      try {
+        final isDioTimeout = error.toString().contains('connectTimeout') ||
+            error.toString().contains('timed out');
+        final msg = isDioTimeout
+            ? "Server connection timed out. Using cached settings."
+            : "Could not load settings. Please check your internet.";
+        ScaffoldMessenger.of(viewContext).showSnackBar(
+          SnackBar(
+            content: Text(msg, style: const TextStyle(color: Colors.white)),
+            backgroundColor: Colors.orange.shade800,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 4),
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        );
+      } catch (_) {}
+      // Proceed anyway so the app doesn't freeze on the splash screen.
+      try {
+        loadNextPage();
+      } catch (navError) {
+        print("Navigation error after settings failure ==> $navError");
+      }
     }
     setBusy(false);
   }
@@ -105,23 +129,12 @@ class SplashViewModel extends MyBaseViewModel {
       Navigator.of(viewContext)
           .pushNamedAndRemoveUntil(AppRoutes.loginRoute, (route) => false);
     } else {
-      var inUseStatus = await Permission.locationWhenInUse.status;
-      var alwaysUseStatus = await Permission.locationAlways.status;
-      final bgPermissinGranted =
-          Platform.isIOS ? true :
-          true;
-          // await FlutterBackground.hasPermissions;
-
-      if (bgPermissinGranted &&
-          inUseStatus.isGranted &&
-          alwaysUseStatus.isGranted) {
-        Navigator.of(viewContext).pushNamedAndRemoveUntil(
-          AppRoutes.homeRoute,
-          (route) => false,
-        );
-      } else {
-        viewContext.nextAndRemoveUntilPage(PermissionPage());
-      }
+      // We intentionally do not check permissions here to comply with Google Play policy
+      // Permissions will be requested in-context when the driver tries to 'Go Online'
+      Navigator.of(viewContext).pushNamedAndRemoveUntil(
+        AppRoutes.homeRoute,
+        (route) => false,
+      );
     }
 
     //

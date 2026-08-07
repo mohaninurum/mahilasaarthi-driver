@@ -45,7 +45,7 @@ class PaymentAccountListItem extends StatelessWidget {
           visible: paymentAccount.instructions.isNotEmpty,
           child: VStack(
             [
-              "Instructions".tr().text.medium.make(),
+              "IFSC Code".tr().text.medium.make(),
               "${paymentAccount.instructions}".text.sm.hairLine.make(),
             ],
           ).pOnly(top: Vx.dp12),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mahilasaarthi/constants/app_strings.dart';
@@ -19,6 +20,8 @@ import 'package:mahilasaarthi/widgets/bottomsheets/new_order_alert.bottomsheet.d
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:georange/georange.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:mahilasaarthi/views/pages/permission/permission.page.dart';
 
 class HomeViewModel extends MyBaseViewModel with UpdateService {
   //
@@ -115,6 +118,20 @@ class HomeViewModel extends MyBaseViewModel with UpdateService {
   }
 
   void toggleOnlineStatus() async {
+    // Check permissions if trying to go online
+    if (!AppService().driverIsOnline) {
+      var inUseStatus = await Permission.locationWhenInUse.status;
+      var alwaysUseStatus = await Permission.locationAlways.status;
+      var systemAlertWindowStatus = await Permission.systemAlertWindow.status;
+      final overlayGranted = Platform.isIOS ? true : systemAlertWindowStatus.isGranted;
+
+      if (!inUseStatus.isGranted || !alwaysUseStatus.isGranted || !overlayGranted) {
+        // Redirect to permission page to show prominent disclosure and request permissions
+        viewContext.nextPage(PermissionPage());
+        return;
+      }
+    }
+
     setBusy(true);
     try {
       //

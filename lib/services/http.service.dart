@@ -38,7 +38,8 @@ class HttpService {
       validateStatus: (status) {
         return status != null && status <= 500;
       },
-      // connectTimeout: 300,
+      connectTimeout: 10000,
+      receiveTimeout: 10000,
     );
     dio = new Dio(baseOptions);
     (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =

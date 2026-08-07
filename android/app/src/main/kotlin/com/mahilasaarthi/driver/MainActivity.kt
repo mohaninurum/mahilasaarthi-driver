@@ -1,4 +1,4 @@
-package com.mahilasaarthi.delivery
+package com.mahilasaarthi.driver
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

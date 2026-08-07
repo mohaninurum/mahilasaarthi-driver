@@ -138,6 +138,43 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:697070209321:android:c6ed34f3e86372e965cf38",
+        "android_client_info": {
+          "package_name": "com.mahilasaarthi.driver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "697070209321-pasoqi121r197lpksvgk4h8v7ob87eju.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mahilasaarthi.driver",
+            "certificate_hash": "85f27abd25f14c75b98be2dba4f0130278ae86b2"
+          }
+        },
+        {
+          "client_id": "697070209321-dl8nsi4k4bd8dp0daq92jp1fa3k92315.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhxJehRZhq7jCldxsVqrApD-fAebKEeV0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "697070209321-dl8nsi4k4bd8dp0daq92jp1fa3k92315.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:697070209321:android:40cad76a5675fa0065cf38",
         "android_client_info": {
           "package_name": "com.mahilasaarthi.vendor"

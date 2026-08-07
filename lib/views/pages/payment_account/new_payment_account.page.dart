@@ -42,8 +42,7 @@ class NewPaymentAccountPage extends StatelessWidget {
                       validator: (value) => FormValidator.validateCustom(value),
                     ).py12(),
                     CustomTextFormField(
-                      labelText: "Instructions".tr(),
-                      keyboardType: TextInputType.multiline,
+                      labelText: "IFSC Code".tr(),
                       textEditingController: vm.instructionsTEC,
                     ).py12(),
                     //

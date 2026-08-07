@@ -26,14 +26,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
         builder: (context, vm, child) {
           return VStack(
             [
-              Visibility(
-                visible: vm.isBusy,
-                child: BusyIndicator().centered().expand(),
-              ),
-              //
-              Visibility(
-                visible: !vm.isBusy,
-                child: Directionality(
+              if (vm.isBusy)
+                BusyIndicator().centered().expand()
+              else
+                Directionality(
                   textDirection: Utils.textDirection,
                   child: OverBoard(
                     pages: vm.onBoardData,
@@ -46,9 +42,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     buttonColor: AppColor.primaryColor,
                     inactiveBulletColor: AppColor.accentColor,
                     activeBulletColor: AppColor.primaryColorDark,
-                  ).expand(),
-                ),
-              ),
+                  ),
+                ).expand(),
             ],
           );
         },

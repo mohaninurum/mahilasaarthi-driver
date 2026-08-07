@@ -68,7 +68,28 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    //
+    // Safe getters to prevent RangeError if translator failed to initialize
+    Locale safeLocale;
+    try {
+      safeLocale = translator.activeLocale;
+    } catch (_) {
+      safeLocale = const Locale('en');
+    }
+
+    Iterable<LocalizationsDelegate<dynamic>> safeDelegates;
+    try {
+      safeDelegates = translator.delegates;
+    } catch (_) {
+      safeDelegates = [];
+    }
+
+    Iterable<Locale> safeLocals;
+    try {
+      safeLocals = translator.locals();
+    } catch (_) {
+      safeLocals = [const Locale('en')];
+    }
+
     return AdaptiveTheme(
       light: AppTheme().lightTheme(),
       dark: AppTheme().darkTheme(),
@@ -80,9 +101,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           title: AppStrings.appName,
           onGenerateRoute: router.generateRoute,
           // initialRoute: _startRoute,
-          localizationsDelegates: translator.delegates,
-          locale: translator.activeLocale,
-          supportedLocales: translator.locals(),
+          localizationsDelegates: safeDelegates,
+          locale: safeLocale,
+          supportedLocales: safeLocals,
           home: SplashPage(),
           theme: AppTheme().lightTheme(),
           // darkTheme: AppTheme().lightTheme(),

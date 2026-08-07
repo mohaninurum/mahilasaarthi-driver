@@ -117,7 +117,9 @@ class _Training_ScreenState extends State<Training_Screen> {
         SizedBox(height: 8,),
           Text(product.description .toString(),style: TextStyle(color: Colors.black,fontSize: 14),),
           SizedBox(height: 10,),
-          SizedBox(height: 160,width: double.infinity,child: Image.network(product.photo.toString(),fit: BoxFit.fill,)),
+          (product.photo != null && product.photo.toString() != "null" && product.photo.toString().isNotEmpty)
+              ? SizedBox(height: 160,width: double.infinity,child: Image.network(product.photo.toString(),fit: BoxFit.fill,))
+              : SizedBox.shrink(),
           SizedBox(height: 10,),
           Divider(color: Colors.grey,)
         ],),),
@@ -151,7 +153,9 @@ class _Training_ScreenState extends State<Training_Screen> {
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(7)),child: Column(
           children: [
             Row(children: [
-              SizedBox(height: 80,width: 110,child: Image.network(product.photo.toString(),fit: BoxFit.fill,)),
+              (product.photo != null && product.photo.toString() != "null" && product.photo.toString().isNotEmpty)
+                  ? SizedBox(height: 80,width: 110,child: Image.network(product.photo.toString(),fit: BoxFit.fill,))
+                  : SizedBox.shrink(),
              SizedBox(width: 15,),
                Expanded(
                  child: Column(crossAxisAlignment: CrossAxisAlignment.start,mainAxisAlignment: MainAxisAlignment.start,children: [

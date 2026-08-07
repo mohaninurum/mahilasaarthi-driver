@@ -4,7 +4,7 @@ import 'package:firestore_chat/firestore_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:mahilasaarthi/constants/app_strings.dart';
 import 'package:mahilasaarthi/models/delivery_address.dart';
 import 'package:mahilasaarthi/services/location.service.dart';
@@ -113,29 +113,9 @@ class MyBaseViewModel extends BaseViewModel {
   }
 
   //show toast
-  toastSuccessful(String msg) {
-    Fluttertoast.showToast(
-      msg: msg,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 2,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 14.0,
-    );
-  }
+  void toastSuccessful(String msg) => ToastService.toastSuccessful(msg);
 
-  toastError(String msg) {
-    Fluttertoast.showToast(
-      msg: msg,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 2,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
-      fontSize: 14.0,
-    );
-  }
+  void toastError(String msg) => ToastService.toastError(msg);
 }
 
 

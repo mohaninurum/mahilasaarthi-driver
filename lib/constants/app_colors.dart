@@ -124,6 +124,9 @@ class AppColor {
     //
     final selectedColor =
         appColorsObject != null ? appColorsObject[colorRef] : "#000000";
-    return selectedColor;
+    if (selectedColor == null || selectedColor.toString().isEmpty) {
+      return "#000000";
+    }
+    return selectedColor.toString();
   }
 }

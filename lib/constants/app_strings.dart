@@ -63,7 +63,11 @@ class AppStrings {
 
   //UI Configures
   static dynamic get uiConfig {
-    return env('ui') ?? null;
+    final ui = env('ui');
+    if (ui is Map) {
+      return ui;
+    }
+    return null;
   }
 
   static bool get qrcodeLogin {
@@ -116,6 +120,9 @@ class AppStrings {
     //
     getAppSettingsFromLocalStorage();
     //
-    return appSettingsObject != null ? appSettingsObject[ref] : "";
+    if (appSettingsObject != null && appSettingsObject[ref] != null) {
+      return appSettingsObject[ref];
+    }
+    return "";
   }
 }

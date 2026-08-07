@@ -12,23 +12,39 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BasePage(
+      // Explicit white background prevents grey flash before theme loads
+      backgroundColor: Colors.white,
       body: ViewModelBuilder<SplashViewModel>.reactive(
         viewModelBuilder: () => SplashViewModel(context),
         onViewModelReady: (vm) => vm.initialise(),
         builder: (context, model, child) {
-          return VStack(
-            [
-              //
-              Image.asset(AppImages.appLogo)
-                  .wh(context.percentWidth * 45, context.percentWidth * 45)
-                  .box
-                  .clip(Clip.antiAlias)
-                  .roundedSM
-                  .makeCentered()
-                  .py12(),
-              "Loading Please wait...".tr().text.makeCentered(),
-            ],
-          ).centered();
+          // Always show the logo + status text — no grey retry screen
+          return Container(
+            color: Colors.white,
+            child: VStack(
+              [
+                Image.asset(AppImages.appLogo)
+                    .wh(context.percentWidth * 45, context.percentWidth * 45)
+                    .box
+                    .clip(Clip.antiAlias)
+                    .roundedSM
+                    .makeCentered()
+                    .py12(),
+                if (model.isBusy)
+                  VStack([
+                    "Loading Please wait...".tr().text.gray500.makeCentered(),
+                    const SizedBox(height: 12),
+                    const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ).centered(),
+                  ])
+                else
+                  "Loading Please wait...".tr().text.gray500.makeCentered(),
+              ],
+            ).centered(),
+          );
         },
       ),
     );

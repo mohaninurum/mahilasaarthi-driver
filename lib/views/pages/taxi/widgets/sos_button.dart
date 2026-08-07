@@ -27,7 +27,30 @@ class SOSButton extends StatelessWidget {
           .onTap(
         () {
           try {
-            launchUrlString("tel:${AppStrings.emergencyContact}");
+            final contacts = AppStrings.emergencyContact.split(',').where((e) => e.trim().isNotEmpty).toList();
+            if (contacts.isEmpty) return;
+            if (contacts.length == 1) {
+              launchUrlString("tel:${contacts.first.trim()}");
+            } else {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return SafeArea(
+                    child: VStack([
+                      "Select Emergency Contact".tr().text.xl.bold.make().p12(),
+                      ...contacts.map((contact) => ListTile(
+                        leading: Icon(Icons.phone),
+                        title: contact.trim().text.make(),
+                        onTap: () {
+                          Navigator.pop(context);
+                          launchUrlString("tel:${contact.trim()}");
+                        },
+                      )).toList(),
+                    ]),
+                  );
+                },
+              );
+            }
           } catch (error) {
             AlertService.error(title: "SOS".tr(), text: "$error");
           }

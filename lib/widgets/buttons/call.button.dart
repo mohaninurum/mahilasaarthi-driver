@@ -28,14 +28,17 @@ class CallButton extends StatelessWidget {
       color: Colors.white,
     ).p8().box.color(AppColor.primaryColor).roundedFull.make().onInkTap(() async {
       print(vendor?.phone ?? phoneModile);
-      String phone = "";
-      phone   = (await AuthServices.getCurrentUser()).phone.toString();
+      String targetPhone = vendor?.phone ?? phoneModile ?? "";
+      
+      if (targetPhone.isNotEmpty) {
+        launchUrlString("tel:$targetPhone");
+      }
 
-      // launchUrlString("tel://${vendor?.phone ?? phone}");
-
-      Utils.showLoadingDialog(context);
-      await AuthRequest().CallDriverApi(from: (phone.toString().contains("+91")) ?(phone.toString().substring(3,phone.length)) : phone,to: ((vendor?.phone ?? phoneModile).toString().contains("+91")) ?((vendor?.phone ?? phoneModile).toString().substring(3,(vendor?.phone ?? phoneModile)!.length)  ):(vendor?.phone ?? phoneModile));
-      Navigator.pop(context);
+      // Commented out the CallDriverApi as it was not placing the call
+      // String phone = (await AuthServices.getCurrentUser()).phone.toString();
+      // Utils.showLoadingDialog(context);
+      // await AuthRequest().CallDriverApi(from: (phone.toString().contains("+91")) ?(phone.toString().substring(3,phone.length)) : phone,to: ((vendor?.phone ?? phoneModile).toString().contains("+91")) ?((vendor?.phone ?? phoneModile).toString().substring(3,(vendor?.phone ?? phoneModile)!.length)  ):(vendor?.phone ?? phoneModile));
+      // Navigator.pop(context);
     });
   }
 }

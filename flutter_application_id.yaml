@@ -1,7 +1,7 @@
 flutter_application_id:
   android:
-    id: "com.mahilasaarthi.delivery"
+    id: "com.mahilasaarthi.driver"
     name: "Mahila Delivery"
   ios:
-    id: "com.mahilasaarthi.delivery"
+    id: "com.mahilasaarthi.driver"
     name: "Mahila Delivery"

@@ -40,55 +40,72 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 //   );
 // }
 
+// Global flag to check if translator initialized successfully
+bool _translatorReady = false;
+
 void main() async {
   await runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
-      //setting up firebase notifications
-      await Firebase.initializeApp();
+      
+      try {
+        // setting up firebase notifications
+        await Firebase.initializeApp();
+      } catch (e) {
+        print("Firebase init error: $e");
+      }
 
-      // if (kDebugMode) {
-      //   // Force disable Crashlytics collection while doing every day development.
-      //   // Temporarily toggle this to true if you want to test crash reporting in your app.
-      //   await FirebaseCrashlytics.instance
-      //       .setCrashlyticsCollectionEnabled(false);
-      // } else {
-      //   // Handle Crashlytics enabled status when not in Debug,
-      //   // e.g. allow your users to opt-in to crash reporting.
-      // }
+      try {
+        await translator.init(
+          localeType: LocalizationDefaultType.asDefined,
+          languagesList: AppLanguages.codes,
+          assetsDirectory: 'assets/lang/',
+        );
+        _translatorReady = true;
+      } catch (e) {
+        print("Translator init error: $e");
+        _translatorReady = false;
+      }
+      
+      try {
+        await LocalStorageService.getPrefs();
+      } catch (e) {
+        print("LocalStorageService init error: $e");
+      }
 
-      //
-      await translator.init(
-        localeType: LocalizationDefaultType.asDefined,
-        languagesList: AppLanguages.codes,
-        assetsDirectory: 'assets/lang/',
-      );
-      //
-      await LocalStorageService.getPrefs();
+      try {
+        await NotificationService.clearIrrelevantNotificationChannels();
+        await NotificationService.initializeAwesomeNotification();
+        await NotificationService.listenToActions();
+        await FirebaseService().setUpFirebaseMessaging();
+      } catch (e) {
+        print("Notification/Firebase Messaging init error: $e");
+      }
 
-      await NotificationService.clearIrrelevantNotificationChannels();
-      await NotificationService.initializeAwesomeNotification();
-      await NotificationService.listenToActions();
-      await FirebaseService().setUpFirebaseMessaging();
-      // FirebaseMessaging.onBackgroundMessage(
-      //   GeneralAppService.onBackground  MessageHandler,
-      // );
-      LocationServiceWatcher.listenToDelayLocationUpdate();
-      //
+      try {
+        LocationServiceWatcher.listenToDelayLocationUpdate();
+      } catch (e) {
+        print("LocationServiceWatcher init error: $e");
+      }
 
-      //prevent ssl error
-      // HttpOverrides.global = new MyHttpOverrides();
-      // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
-      // final bool? status = await FlutterOverlayWindow.requestPermission();
-      // Run app!
-      runApp(
-        LocalizedApp(
-          child: MyApp(),
-        ),
-      );
+      // Run app! Wrap in LocalizedApp only if translator is ready
+      if (_translatorReady) {
+        runApp(
+          LocalizedApp(
+            child: MyApp(),
+          ),
+        );
+      } else {
+        runApp(MyApp());
+      }
     },
     (error, stackTrace) {
-      FirebaseCrashlytics.instance.recordError(error, stackTrace);
+      print("Global Error: $error");
+      try {
+        FirebaseCrashlytics.instance.recordError(error, stackTrace);
+      } catch (e) {
+        print("Crashlytics error: $e");
+      }
     },
   );
 }

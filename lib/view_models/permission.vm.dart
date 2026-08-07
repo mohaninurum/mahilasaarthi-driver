@@ -38,14 +38,34 @@ class PermissionViewModel extends MyBaseViewModel {
     // if all permissions granted
     if (locationPermissionGranted && bgLocationPermissionGranted) {
       //for android
-      if (Platform.isAndroid &&
-          bgPermissionGranted &&
-          overlayPermissionGranted) {
-        loadHomepage();
+      if (Platform.isAndroid) {
+        if (bgPermissionGranted && overlayPermissionGranted) {
+          loadHomepage();
+          return;
+        }
       } else {
         loadHomepage();
+        return;
       }
     }
+
+    // Jump to the first ungranted permission step
+    if (!locationPermissionGranted) {
+      currentStep = 0;
+    } else if (!bgLocationPermissionGranted) {
+      currentStep = 1;
+    } else if (Platform.isAndroid && !bgPermissionGranted) {
+      currentStep = 2;
+    } else if (Platform.isAndroid && !overlayPermissionGranted) {
+      currentStep = 3;
+    }
+
+    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (pageController.hasClients) {
+        pageController.jumpToPage(currentStep);
+      }
+    });
   }
 
   List<Widget> permissionPages() {

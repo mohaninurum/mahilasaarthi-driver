@@ -18,7 +18,7 @@ class BackgroundLocationPermissionDialog extends StatelessWidget {
         [
           //title
           "Background Location Permission".tr().text.semiBold.xl.make().py12(),
-          "This app collects location data to enable system search for assignable order within your location and also allow customer track your location when delivering their order even when the app is closed or not in use."
+          "Mahila Saarthi Driver collects location data to enable ride assignments and track ongoing trips even when the app is closed or not in use."
               .tr()
               .text
               .make(),

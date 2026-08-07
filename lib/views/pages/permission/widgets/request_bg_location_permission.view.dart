@@ -37,7 +37,7 @@ class _RequestBGLocationPermissionViewState
         VStack(
           [
             UiSpacer.vSpace(),
-            "In order to provide you with a seamless experience, we need to access your location data even when the app is not in use. This will allow us to offer personalized recommendations, send notifications about nearby events or promotions, and help you navigate your way to your destination."
+            "Mahila Saarthi Driver collects location data to enable ride assignments and track ongoing trips even when the app is closed or not in use."
                 .tr()
                 .text
                 .lg
@@ -66,7 +66,7 @@ class _RequestBGLocationPermissionViewState
         Visibility(
           visible: !Platform.isIOS,
           child: CustomTextButton(
-            title: "Skip".tr(),
+            title: "Not Now".tr(),
             onPressed: widget.vm.nextStep,
           ).wFull(context),
         ),
