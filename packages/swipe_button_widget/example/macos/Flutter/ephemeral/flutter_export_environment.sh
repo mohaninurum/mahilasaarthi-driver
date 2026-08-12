@@ -3,7 +3,6 @@
 export "FLUTTER_ROOT=C:\Users\Inurum_Four\fvm\versions\3.10.6"
 export "FLUTTER_APPLICATION_PATH=D:\InurumFlutter\mg\driver and customer\mahilasaarthi\driver\packages\swipe_button_widget\example"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
-export "FLUTTER_TARGET=lib\main.dart"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"
 export "FLUTTER_BUILD_NUMBER=1"
