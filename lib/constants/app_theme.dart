@@ -3,12 +3,18 @@ import 'package:mahilasaarthi/constants/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
+  String? _safeFontFamily() {
+    try {
+      return GoogleFonts.nunito().fontFamily;
+    } catch (_) {
+      return null;
+    }
+  }
+
   //
   ThemeData lightTheme() {
     return ThemeData(
-      // fontFamily: GoogleFonts.iBMPlexSerif().fontFamily,
-      // fontFamily: GoogleFonts.krub().fontFamily,
-      fontFamily: GoogleFonts.nunito().fontFamily,
+      fontFamily: _safeFontFamily(),
       primaryColor: AppColor.primaryColor,
       primaryColorDark: AppColor.primaryColorDark,
       textSelectionTheme: TextSelectionThemeData(
@@ -44,9 +50,7 @@ class AppTheme {
   //
   ThemeData darkTheme() {
     return ThemeData(
-      // fontFamily: GoogleFonts.iBMPlexSerif().fontFamily,
-      // fontFamily: GoogleFonts.krub().fontFamily,
-      fontFamily: GoogleFonts.nunito().fontFamily,
+      fontFamily: _safeFontFamily(),
       primaryColor: AppColor.primaryColor,
       primaryColorDark: AppColor.primaryColorDark,
       textSelectionTheme: TextSelectionThemeData(

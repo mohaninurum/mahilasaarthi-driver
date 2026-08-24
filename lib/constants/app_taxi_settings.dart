@@ -3,64 +3,58 @@ import 'package:supercharged/supercharged.dart';
 
 class AppTaxiSettings extends AppStrings {
   static bool get requiredBookingCode {
-    if (AppStrings.env('taxi') == null ||
-        AppStrings.env('taxi')["requestBookingCode"] == null) {
+    final taxi = AppStrings.env('taxi');
+    if (taxi is! Map || taxi["requestBookingCode"] == null) {
       return false;
     }
     return true;
- }
+  }
 
   static bool get requiredBookingCodeBeforeTrip {
-    // if (AppStrings.env('taxi') == null ||
-    //     AppStrings.env('taxi')["requestBookingCode"] == null) {
-    //   return false;
-    // }
-    // return ["both", "before"]
-    //     .contains(AppStrings.env('taxi')["requestBookingCode"]);
     return true;
   }
 
   static bool get requiredBookingCodeAfterTrip {
-    if (AppStrings.env('taxi') == null ||
-        AppStrings.env('taxi')["requestBookingCode"] == null) {
+    final taxi = AppStrings.env('taxi');
+    if (taxi is! Map || taxi["requestBookingCode"] == null) {
       return false;
     }
     return ["both", "after"]
-        .contains(AppStrings.env('taxi')["requestBookingCode"]);
+        .contains(taxi["requestBookingCode"]);
   }
 
   //
   static bool get showTaxiPickupInfo {
-    if (AppStrings.env('taxi') == null ||
-        AppStrings.env('taxi')["showTaxiPickupInfo"] == null) {
+    final taxi = AppStrings.env('taxi');
+    if (taxi is! Map || taxi["showTaxiPickupInfo"] == null) {
       return true;
     }
 
     //
-    if (AppStrings.env('taxi')["showTaxiPickupInfo"] is bool) {
-      return AppStrings.env('taxi')["showTaxiPickupInfo"];
+    if (taxi["showTaxiPickupInfo"] is bool) {
+      return taxi["showTaxiPickupInfo"];
     }
 
     //
     int value =
-        AppStrings.env('taxi')["showTaxiPickupInfo"].toString().toInt() ?? 0;
+        taxi["showTaxiPickupInfo"].toString().toInt() ?? 0;
     return value == 1;
   }
 
   static bool get showTaxiDropoffInfo {
-    if (AppStrings.env('taxi') == null ||
-        AppStrings.env('taxi')["showTaxiDropoffInfo"] == null) {
+    final taxi = AppStrings.env('taxi');
+    if (taxi is! Map || taxi["showTaxiDropoffInfo"] == null) {
       return true;
     }
 
     //
-    if (AppStrings.env('taxi')["showTaxiDropoffInfo"] is bool) {
-      return AppStrings.env('taxi')["showTaxiDropoffInfo"];
+    if (taxi["showTaxiDropoffInfo"] is bool) {
+      return taxi["showTaxiDropoffInfo"];
     }
 
     //
     int value =
-        AppStrings.env('taxi')["showTaxiDropoffInfo"].toString().toInt() ?? 0;
+        taxi["showTaxiDropoffInfo"].toString().toInt() ?? 0;
     return value == 1;
   }
 }

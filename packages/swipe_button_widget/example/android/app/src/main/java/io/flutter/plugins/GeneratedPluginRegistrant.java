@@ -17,7 +17,7 @@ public final class GeneratedPluginRegistrant {
   public static void registerWith(@NonNull FlutterEngine flutterEngine) {
     try {
       flutterEngine.getPlugins().add(new com.mahmoudsalah37.swipe_button_widget.SwipeButtonWidgetPlugin());
-    } catch(Exception e) {
+    } catch (Exception e) {
       Log.e(TAG, "Error registering plugin swipe_button_widget, com.mahmoudsalah37.swipe_button_widget.SwipeButtonWidgetPlugin", e);
     }
   }

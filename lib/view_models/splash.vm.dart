@@ -10,6 +10,7 @@ import 'package:mahilasaarthi/constants/app_routes.dart';
 import 'package:mahilasaarthi/constants/app_strings.dart';
 import 'package:mahilasaarthi/constants/app_theme.dart';
 import 'package:mahilasaarthi/requests/settings.request.dart';
+import 'package:mahilasaarthi/services/app.service.dart';
 import 'package:mahilasaarthi/services/auth.service.dart';
 import 'package:mahilasaarthi/services/firebase.service.dart';
 import 'package:mahilasaarthi/services/local_storage.service.dart';
@@ -37,6 +38,7 @@ class SplashViewModel extends MyBaseViewModel {
   //
 
   //
+  //
   loadAppSettings() async {
     setBusy(true);
     try {
@@ -44,17 +46,30 @@ class SplashViewModel extends MyBaseViewModel {
       // Fetch emergency contacts explicitly
       try {
         final emergencyResult = await settingsRequest.emergencyContacts();
-        final driverSOS = emergencyResult.body["driverEmergencyContact"] ?? "112";
-        await LocalStorageService.prefs?.setString('customDriverSOS', driverSOS);
+        if (emergencyResult.body is Map && emergencyResult.body["driverEmergencyContact"] != null) {
+          final driverSOS = emergencyResult.body["driverEmergencyContact"] ?? "112";
+          await LocalStorageService.prefs?.setString('customDriverSOS', driverSOS);
+        }
       } catch (e) {
         print("Emergency contacts fetch error: $e");
       }
       
       //app settings
-      await updateAppVariables(appSettingsObject.body["strings"]);
+      try {
+        if (appSettingsObject.body is Map && appSettingsObject.body["strings"] != null) {
+          await updateAppVariables(appSettingsObject.body["strings"]);
+        }
+      } catch (e) {
+        print("updateAppVariables error: $e");
+      }
       //colors
-      await updateAppTheme(appSettingsObject.body["colors"]);
-      loadNextPage();
+      try {
+        if (appSettingsObject.body is Map && appSettingsObject.body["colors"] != null) {
+          await updateAppTheme(appSettingsObject.body["colors"]);
+        }
+      } catch (e) {
+        print("updateAppTheme error: $e");
+      }
     } catch (error) {
       print("Error loading app settings ==> $error");
       // Show a user-friendly message on timeout / no internet
@@ -64,87 +79,109 @@ class SplashViewModel extends MyBaseViewModel {
         final msg = isDioTimeout
             ? "Server connection timed out. Using cached settings."
             : "Could not load settings. Please check your internet.";
-        ScaffoldMessenger.of(viewContext).showSnackBar(
-          SnackBar(
-            content: Text(msg, style: const TextStyle(color: Colors.white)),
-            backgroundColor: Colors.orange.shade800,
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 4),
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-        );
+        final ctx = AppService().navigatorKey.currentContext ?? viewContext;
+        if (ctx != null) {
+          ScaffoldMessenger.of(ctx).showSnackBar(
+            SnackBar(
+              content: Text(msg, style: const TextStyle(color: Colors.white)),
+              backgroundColor: Colors.orange.shade800,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 4),
+              margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+              shape:
+                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          );
+        }
       } catch (_) {}
-      // Proceed anyway so the app doesn't freeze on the splash screen.
-      try {
-        loadNextPage();
-      } catch (navError) {
-        print("Navigation error after settings failure ==> $navError");
-      }
+    } finally {
+      setBusy(false);
+      await loadNextPage();
     }
-    setBusy(false);
   }
 
   //
   updateAppVariables(dynamic json) async {
-    //
-    await AppStrings.saveAppSettingsToLocalStorage(jsonEncode(json));
+    try {
+      await AppStrings.saveAppSettingsToLocalStorage(jsonEncode(json));
+    } catch (e) {
+      print("Error saving app variables: $e");
+    }
   }
 
   //theme change
   updateAppTheme(dynamic colorJson) async {
-    //
-    await AppColor.saveColorsToLocalStorage(jsonEncode(colorJson));
-    //change theme
-    // await AdaptiveTheme.of(viewContext).reset();
-    AdaptiveTheme.of(viewContext).setTheme(
-      light: AppTheme().lightTheme(),
-      dark: AppTheme().darkTheme(),
-      notify: true,
-    );
-    await AdaptiveTheme.of(viewContext).persist();
+    try {
+      await AppColor.saveColorsToLocalStorage(jsonEncode(colorJson));
+      final ctx = AppService().navigatorKey.currentContext ?? viewContext;
+      if (ctx != null) {
+        AdaptiveTheme.of(ctx).setTheme(
+          light: AppTheme().lightTheme(),
+          dark: AppTheme().darkTheme(),
+          notify: true,
+        );
+        await AdaptiveTheme.of(ctx).persist();
+      }
+    } catch (e) {
+      print("Error updating theme: $e");
+    }
   }
 
   //
   loadNextPage() async {
-    //
-    await Utils.setJiffyLocale();
-    //
-    if (AuthServices.firstTimeOnApp()) {
-      //choose language
-      await showModalBottomSheet(
-        context: viewContext,
-        builder: (context) {
-          return AppLanguageSelector();
-        },
-      );
+    try {
+      await Utils.setJiffyLocale();
+    } catch (e) {
+      print("Error setting Jiffy locale: $e");
     }
 
-    //
-    if (AuthServices.firstTimeOnApp()) {
-      Navigator.of(viewContext)
-          .pushNamedAndRemoveUntil(AppRoutes.welcomeRoute, (route) => false);
-    } else if (!AuthServices.authenticated()) {
-      Navigator.of(viewContext)
-          .pushNamedAndRemoveUntil(AppRoutes.loginRoute, (route) => false);
-    } else {
-      // We intentionally do not check permissions here to comply with Google Play policy
-      // Permissions will be requested in-context when the driver tries to 'Go Online'
-      Navigator.of(viewContext).pushNamedAndRemoveUntil(
-        AppRoutes.homeRoute,
-        (route) => false,
-      );
+    final contextToUse = AppService().navigatorKey.currentContext ?? viewContext;
+
+    try {
+      if (AuthServices.firstTimeOnApp()) {
+        if (contextToUse != null) {
+          await showModalBottomSheet(
+            context: contextToUse,
+            builder: (context) {
+              return AppLanguageSelector();
+            },
+          );
+        }
+      }
+    } catch (e) {
+      print("Error opening language selector: $e");
     }
 
-    //
-    RemoteMessage? initialMessage =
-        await FirebaseService().firebaseMessaging.getInitialMessage();
-    if (initialMessage == null) {
-      return;
+    final targetRoute = !AuthServices.authenticated()
+        ? AppRoutes.welcomeRoute
+        : AppRoutes.homeRoute;
+
+    try {
+      if (AppService().navigatorKey.currentState != null) {
+        AppService().navigatorKey.currentState!.pushNamedAndRemoveUntil(
+          targetRoute,
+          (route) => false,
+        );
+      } else if (viewContext != null) {
+        Navigator.of(viewContext).pushNamedAndRemoveUntil(
+          targetRoute,
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      print("Navigation error: $e");
     }
-    FirebaseService().saveNewNotification(initialMessage);
-    FirebaseService().notificationPayloadData = initialMessage.data;
-    FirebaseService().selectNotification("");
+
+    try {
+      RemoteMessage? initialMessage =
+          await FirebaseService().firebaseMessaging.getInitialMessage();
+      if (initialMessage != null) {
+        FirebaseService().saveNewNotification(initialMessage);
+        FirebaseService().notificationPayloadData = initialMessage.data;
+        FirebaseService().selectNotification("");
+      }
+    } catch (e) {
+      print("Firebase messaging initial message error: $e");
+    }
   }
 }

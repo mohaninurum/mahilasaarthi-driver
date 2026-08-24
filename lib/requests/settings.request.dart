@@ -25,10 +25,13 @@ class SettingsRequest extends HttpService {
       return ApiResponse.fromResponse(apiResult);
     } on DioError catch (error) {
       if (error.type == DioErrorType.other) {
-        throw "Connection failed. Please check that your have internet connection on this device."
-                .tr() +
-            "\n" +
-            "Try again later".tr();
+        String msg1 = "Connection failed. Please check that your have internet connection on this device.";
+        String msg2 = "Try again later";
+        try {
+          msg1 = msg1.tr();
+          msg2 = msg2.tr();
+        } catch (_) {}
+        throw "$msg1\n$msg2";
       }
       throw error;
     } catch (error) {

@@ -49,10 +49,14 @@ class BasePage extends StatefulWidget {
 class _BasePageState extends State<BasePage> {
   @override
   Widget build(BuildContext context) {
+    bool isArabic = false;
+    try {
+      isArabic = translator.activeLocale.languageCode == "ar";
+    } catch (_) {
+      isArabic = false;
+    }
     return Directionality(
-      textDirection: translator.activeLocale.languageCode == "ar"
-          ? TextDirection.rtl
-          : TextDirection.ltr,
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor:

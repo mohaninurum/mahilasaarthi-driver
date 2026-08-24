@@ -4,22 +4,26 @@ class AppPageSettings extends AppStrings {
   //
   static int get maxDriverDocumentCount {
     try {
-      if (AppStrings.env('page') == null ||
-          AppStrings.env('page')["settings"] == null) {
+      final pageEnv = AppStrings.env('page');
+      if (pageEnv == null || pageEnv is! Map || pageEnv["settings"] == null || pageEnv["settings"] is! Map) {
         return 2;
       }
       return int.parse(
-          AppStrings.env('page')['settings']["driverDocumentCount"].toString());
+          pageEnv['settings']["driverDocumentCount"].toString());
     } catch (error) {
       return 2;
     }
   }
 
   static String get driverDocumentInstructions {
-    if (AppStrings.env('page') == null ||
-        AppStrings.env('page')["settings"] == null) {
+    try {
+      final pageEnv = AppStrings.env('page');
+      if (pageEnv == null || pageEnv is! Map || pageEnv["settings"] == null || pageEnv["settings"] is! Map) {
+        return "";
+      }
+      return pageEnv['settings']["driverDocumentInstructions"]?.toString() ?? "";
+    } catch (error) {
       return "";
     }
-    return AppStrings.env('page')['settings']["driverDocumentInstructions"];
   }
 }

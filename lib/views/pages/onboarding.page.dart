@@ -20,7 +20,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      body: ViewModelBuilder<OnboardingViewModel>.nonReactive(
+      body: ViewModelBuilder<OnboardingViewModel>.reactive(
         viewModelBuilder: () => OnboardingViewModel(context, finishLoading),
         onViewModelReady: (vm) => vm.initialise(),
         builder: (context, vm, child) {

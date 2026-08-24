@@ -23,10 +23,16 @@ class HttpService {
 
   Future<Map<String, String>> getHeaders() async {
     final userToken = await AuthServices.getAuthBearerToken();
+    String langCode = "en";
+    try {
+      langCode = translator.activeLocale.languageCode;
+    } catch (_) {
+      langCode = "en";
+    }
     return {
       HttpHeaders.acceptHeader: "application/json",
       HttpHeaders.authorizationHeader: "Bearer $userToken",
-      "lang": translator.activeLocale.languageCode,
+      "lang": langCode,
     };
   }
 

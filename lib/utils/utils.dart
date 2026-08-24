@@ -48,18 +48,27 @@ class Utils {
     );
   }
 
-  //
-  static bool get isArabic => translator.activeLocale.languageCode == "ar";
+  static bool get isArabic {
+    try {
+      return translator.activeLocale.languageCode == "ar";
+    } catch (_) {
+      return false;
+    }
+  }
 
   static TextDirection get textDirection =>
       isArabic ? TextDirection.rtl : TextDirection.ltr;
-  //
+
   static bool get currencyLeftSided {
-    final uiConfig = AppStrings.uiConfig;
-    if (uiConfig != null && uiConfig["currency"] != null) {
-      final currencylOCATION = uiConfig["currency"]["location"] ?? 'left';
-      return currencylOCATION.toLowerCase() == "left";
-    } else {
+    try {
+      final uiConfig = AppStrings.uiConfig;
+      if (uiConfig != null && uiConfig["currency"] != null) {
+        final currencylOCATION = uiConfig["currency"]["location"] ?? 'left';
+        return currencylOCATION.toLowerCase() == "left";
+      } else {
+        return true;
+      }
+    } catch (_) {
       return true;
     }
   }
@@ -114,12 +123,21 @@ class Utils {
   }
 
   static setJiffyLocale() async {
-    String cLocale = translator.activeLocale.languageCode;
-    List<String> supportedLocales = Jiffy.getAllAvailableLocales();
-    if (supportedLocales.contains(cLocale)) {
-      await Jiffy.locale(translator.activeLocale.languageCode);
-    } else {
-      await Jiffy.locale("en");
+    try {
+      String cLocale = "en";
+      try {
+        cLocale = translator.activeLocale.languageCode;
+      } catch (_) {
+        cLocale = "en";
+      }
+      List<String> supportedLocales = Jiffy.getAllAvailableLocales();
+      if (supportedLocales.contains(cLocale)) {
+        await Jiffy.locale(cLocale);
+      } else {
+        await Jiffy.locale("en");
+      }
+    } catch (e) {
+      print("Jiffy locale error: $e");
     }
   }
 

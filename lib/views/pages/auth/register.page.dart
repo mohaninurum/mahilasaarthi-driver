@@ -356,7 +356,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           ).py20(),
                         ),
 
-
                         UiSpacer.divider(),
 
                         FormBuilderCheckbox(

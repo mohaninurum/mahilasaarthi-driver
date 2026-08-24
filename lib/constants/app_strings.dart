@@ -4,17 +4,25 @@ import 'package:supercharged/supercharged.dart';
 
 class AppStrings {
   //
-  static String get appName => env('app_name');
-  static String get companyName => env('company_name');
-  static String get googleMapApiKey => env('google_maps_key');
-  static String get fcmApiKey => env('fcm_key');
-  static String get currencySymbol => env('currency');
-  static String get countryCode => env('country_code');
+  static String get appName => env('app_name') ?? "";
+  static String get companyName => env('company_name') ?? "";
+  static String get googleMapApiKey => env('google_maps_key') ?? "";
+  static String get fcmApiKey => env('fcm_key') ?? "";
+  static String get currencySymbol => env('currency') ?? "";
+  static String get countryCode => env('country_code') ?? "";
 
   //
   static bool get enableOtp => ["1", 1, "true", true].contains(env('enble_otp'));
-  static bool get enableOTPLogin => ["1", 1, "true", true].contains(env('enableOTPLogin'));
-  static bool get enableEmailLogin => ["1", 1, "true", true].contains(env('enableEmailLogin'));
+  static bool get enableOTPLogin {
+    final val = env('enableOTPLogin');
+    if (val == null || val == "" || val.toString().isEmpty) return true;
+    return ["1", 1, "true", true].contains(val);
+  }
+  static bool get enableEmailLogin {
+    final val = env('enableEmailLogin');
+    if (val == null || val == "" || val.toString().isEmpty) return true;
+    return ["1", 1, "true", true].contains(val);
+  }
   static bool get enableProfileUpdate => ["1", 1, "true", true].contains(env('enableProfileUpdate'));
   //
 
@@ -103,26 +111,29 @@ class AppStrings {
   //
   //saving
   static Future<bool> saveAppSettingsToLocalStorage(String colorsMap) async {
-    return await LocalStorageService.prefs!
-        .setString(AppStrings.appRemoteSettings, colorsMap);
+    return await LocalStorageService.prefs
+        ?.setString(AppStrings.appRemoteSettings, colorsMap) ?? false;
   }
 
   static dynamic appSettingsObject;
   static Future<void> getAppSettingsFromLocalStorage() async {
-    appSettingsObject =
-        LocalStorageService.prefs!.getString(AppStrings.appRemoteSettings);
-    if (appSettingsObject != null) {
-      appSettingsObject = jsonDecode(appSettingsObject);
+    try {
+      final settingsStr = LocalStorageService.prefs?.getString(AppStrings.appRemoteSettings);
+      if (settingsStr != null && settingsStr.isNotEmpty) {
+        appSettingsObject = jsonDecode(settingsStr);
+      }
+    } catch (e) {
+      print("Error reading settings from local storage: $e");
     }
   }
 
   static dynamic env(String ref) {
-    //
-    getAppSettingsFromLocalStorage();
-    //
-    if (appSettingsObject != null && appSettingsObject[ref] != null) {
-      return appSettingsObject[ref];
-    }
-    return "";
+    try {
+      getAppSettingsFromLocalStorage();
+      if (appSettingsObject != null && appSettingsObject is Map && appSettingsObject[ref] != null) {
+        return appSettingsObject[ref];
+      }
+    } catch (_) {}
+    return null;
   }
 }

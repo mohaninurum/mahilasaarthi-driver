@@ -118,7 +118,7 @@ class NotificationService {
   static Future<List<NotificationModel>> getNotifications() async {
     //
     final pref = await LocalStorageService.getPrefs();
-    final notificationsStringList = pref.getString(
+    final notificationsStringList = pref?.getString(
           AppStrings.notificationsKey,
         ) ??
         null;

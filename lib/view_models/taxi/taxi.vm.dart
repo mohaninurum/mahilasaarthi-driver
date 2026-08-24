@@ -174,6 +174,14 @@ class TaxiViewModel extends MyBaseViewModel {
     taxiLocationService.zoomToLocation();
     taxiGoogleMapManagerService.updateGoogleMapPadding(20);
   }
+
+  @override
+  void dispose() {
+    if (!uiStream.isClosed) {
+      uiStream.close();
+    }
+    super.dispose();
+  }
 }
 
 

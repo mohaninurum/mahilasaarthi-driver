@@ -57,7 +57,8 @@ class TaxiLocationService {
               event.longitude,
             ),
             rotation: event.heading,
-            icon: taxiViewModel!.taxiGoogleMapManagerService.driverIcon!,
+            icon: taxiViewModel?.taxiGoogleMapManagerService.driverIcon ??
+                BitmapDescriptor.defaultMarker,
             anchor: Offset(0.5, 0.5),
           );
 
@@ -150,10 +151,11 @@ class TaxiLocationService {
       longitude: latLng.longitude,
     );
     final distance = GeoRange().distance(startPoint, endPoint);
-    double etaInHours = (distance /
-        (AppStrings.env("taxi")["drivingSpeed"] ?? "50")
-            .toString()
-            .toDouble()!);
+    final taxiEnv = AppStrings.env("taxi");
+    final drivingSpeed = (taxiEnv is Map ? taxiEnv["drivingSpeed"] : null) ?? "50";
+    double speed = double.tryParse(drivingSpeed.toString()) ?? 50.0;
+    if (speed <= 0) speed = 50.0;
+    double etaInHours = distance / speed;
     final eta = (etaInHours * 60).ceil();
     etaStream.add(eta);
   }

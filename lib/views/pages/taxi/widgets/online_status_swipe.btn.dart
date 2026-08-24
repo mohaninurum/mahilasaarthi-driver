@@ -1,8 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:mahilasaarthi/services/alert.service.dart';
 import 'package:mahilasaarthi/view_models/taxi/taxi.vm.dart';
+import 'package:mahilasaarthi/views/pages/permission/permission.page.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:swipe_button_widget/swipe_button_widget.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -52,6 +55,17 @@ class _OnlineStatusSwipeButtonState extends State<OnlineStatusSwipeButton> {
       await Future.delayed(const Duration(milliseconds: 500));
       try {
         final newDriverState = !widget.vm.appService.driverIsOnline;
+        if (newDriverState) {
+          var inUseStatus = await Permission.locationWhenInUse.status;
+          var alwaysUseStatus = await Permission.locationAlways.status;
+          var systemAlertWindowStatus = await Permission.systemAlertWindow.status;
+          final overlayGranted = Platform.isIOS ? true : systemAlertWindowStatus.isGranted;
+
+          if (!inUseStatus.isGranted || !alwaysUseStatus.isGranted || !overlayGranted) {
+            context.nextPage(PermissionPage());
+            return;
+          }
+        }
         await widget.vm.newTaxiBookingService.toggleVisibility(newDriverState, showLoading: true);
         setState(() {});
       } catch (error) {

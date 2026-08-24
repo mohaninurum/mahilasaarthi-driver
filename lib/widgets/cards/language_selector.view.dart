@@ -14,13 +14,16 @@ class AppLanguageSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String titleText = "Select your preferred language";
+    try {
+      titleText = titleText.tr();
+    } catch (_) {}
+
     return SafeArea(
       child: VStack(
         [
           //
-          "Select your preferred language"
-              .tr()
-              .text
+          titleText.text
               .xl
               .semiBold
               .make()
@@ -82,17 +85,24 @@ class AppLanguageSelector extends StatelessWidget {
   }
 
   void _onSelected(BuildContext context, String code) async {
-    await AuthServices.setLocale(code);
-    //
-    await translator.setNewLanguage(
-      context,
-      newLanguage: code,
-      remember: true,
-      restart: true,
-    );
-    await Utils.setJiffyLocale();
-    //
-    Navigator.pop(context, true);
+    try {
+      await AuthServices.setLocale(code);
+      await translator.setNewLanguage(
+        context,
+        newLanguage: code,
+        remember: true,
+        restart: false,
+      );
+      await Utils.setJiffyLocale();
+    } catch (e) {
+      print("Error changing language: $e");
+    }
+
+    try {
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context, true);
+      }
+    } catch (_) {}
   }
 }
 

@@ -9,6 +9,14 @@ import 'package:velocity_x/velocity_x.dart';
 class SplashPage extends StatelessWidget {
   const SplashPage({Key? key}) : super(key: key);
 
+  String _trSafe(String text) {
+    try {
+      return text.tr();
+    } catch (_) {
+      return text;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BasePage(
@@ -32,7 +40,7 @@ class SplashPage extends StatelessWidget {
                     .py12(),
                 if (model.isBusy)
                   VStack([
-                    "Loading Please wait...".tr().text.gray500.makeCentered(),
+                    _trSafe("Loading Please wait...").text.gray500.makeCentered(),
                     const SizedBox(height: 12),
                     const SizedBox(
                       width: 24,
@@ -41,7 +49,7 @@ class SplashPage extends StatelessWidget {
                     ).centered(),
                   ])
                 else
-                  "Loading Please wait...".tr().text.gray500.makeCentered(),
+                  _trSafe("Loading Please wait...").text.gray500.makeCentered(),
               ],
             ).centered(),
           );

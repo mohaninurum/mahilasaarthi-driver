@@ -68,7 +68,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    // Safe getters to prevent RangeError if translator failed to initialize
+    // Safe getters to prevent RangeError / Empty list if translator failed to initialize
     Locale safeLocale;
     try {
       safeLocale = translator.activeLocale;
@@ -76,19 +76,21 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       safeLocale = const Locale('en');
     }
 
-    Iterable<LocalizationsDelegate<dynamic>> safeDelegates;
+    Iterable<LocalizationsDelegate<dynamic>>? safeDelegates;
     try {
-      safeDelegates = translator.delegates;
-    } catch (_) {
-      safeDelegates = [];
-    }
+      final delegates = translator.delegates;
+      if (delegates.isNotEmpty) {
+        safeDelegates = delegates;
+      }
+    } catch (_) {}
 
-    Iterable<Locale> safeLocals;
+    Iterable<Locale> safeLocals = const [Locale('en'), Locale('hi')];
     try {
-      safeLocals = translator.locals();
-    } catch (_) {
-      safeLocals = [const Locale('en')];
-    }
+      final locals = translator.locals();
+      if (locals.isNotEmpty) {
+        safeLocals = locals;
+      }
+    } catch (_) {}
 
     return AdaptiveTheme(
       light: AppTheme().lightTheme(),

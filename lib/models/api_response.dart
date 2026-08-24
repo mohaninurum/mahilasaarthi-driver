@@ -20,31 +20,26 @@ class ApiResponse {
 
   factory ApiResponse.fromResponse(dynamic response) {
     //
-    int code = response.statusCode;
-    dynamic body = response.data ?? null; // Would mostly be a Map
+    int code = response.statusCode ?? 500;
+    dynamic body = response.data; // Would mostly be a Map
     List errors = [];
     String message = "";
 
-    switch (code) {
-      case 200:
-        try {
-          if (body is Map && body.containsKey("message")) {
-            message = body["message"] ?? "";
-          } else if (body is String) {
-            message = body;
-          } else {
-            message = body["message"] ?? "";
-          }
-        } catch (error) {
-          print("Message reading error ==> $error");
-        }
+    try {
+      if (body is Map && body.containsKey("message")) {
+        message = body["message"]?.toString() ?? "";
+      } else if (body is String) {
+        message = body;
+      }
+    } catch (error) {
+      print("Message reading error ==> $error");
+    }
 
-        break;
-      default:
-        message = body["message"] ??
-            "Whoops! Something went wrong, please contact support.";
-        errors.add(message);
-        break;
+    if (code != 200) {
+      if (message.isEmpty) {
+        message = "Whoops! Something went wrong, please contact support.";
+      }
+      errors.add(message);
     }
 
     return ApiResponse(

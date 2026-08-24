@@ -6,38 +6,57 @@ import 'package:mahilasaarthi/services/local_storage.service.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class AppColor {
-  static Color get accentColor => Vx.hexToColor(colorEnv('accentColor'));
-  static Color get primaryColor => Vx.hexToColor(colorEnv('primaryColor'));
-  static Color get primaryColorDark =>
-      Vx.hexToColor(colorEnv('primaryColorDark'));
+  static Color _safeHexColor(String colorRef, Color defaultColor) {
+    try {
+      final hex = colorEnv(colorRef);
+      if (hex.isEmpty || hex == "#000000") return defaultColor;
+      return Vx.hexToColor(hex);
+    } catch (_) {
+      return defaultColor;
+    }
+  }
+
+  static int _safeHexInt(String colorRef, int defaultColorInt) {
+    try {
+      final hex = colorEnv(colorRef);
+      if (hex.isEmpty || hex == "#000000") return defaultColorInt;
+      return Vx.getColorFromHex(hex);
+    } catch (_) {
+      return defaultColorInt;
+    }
+  }
+
+  static Color get accentColor => _safeHexColor('accentColor', const Color(0xFF5E17EB));
+  static Color get primaryColor => _safeHexColor('primaryColor', const Color(0xFF5E17EB));
+  static Color get primaryColorDark => _safeHexColor('primaryColorDark', const Color(0xFF3B0CA7));
   static Color get cursorColor => accentColor;
 
   //material color
   static MaterialColor get accentMaterialColor => MaterialColor(
-        Vx.getColorFromHex(colorEnv('accentColor')),
+        _safeHexInt('accentColor', 0xFF5E17EB),
         <int, Color>{
-          50: Vx.hexToColor(colorEnv('accentColor')),
-          100: Vx.hexToColor(colorEnv('accentColor')),
-          200: Vx.hexToColor(colorEnv('accentColor')),
-          300: Vx.hexToColor(colorEnv('accentColor')),
-          400: Vx.hexToColor(colorEnv('accentColor')),
-          500: Vx.hexToColor(colorEnv('accentColor')),
-          600: Vx.hexToColor(colorEnv('accentColor')),
-          700: Vx.hexToColor(colorEnv('accentColor')),
-          800: Vx.hexToColor(colorEnv('accentColor')),
-          900: Vx.hexToColor(colorEnv('accentColor')),
+          50: accentColor,
+          100: accentColor,
+          200: accentColor,
+          300: accentColor,
+          400: accentColor,
+          500: accentColor,
+          600: accentColor,
+          700: accentColor,
+          800: accentColor,
+          900: accentColor,
         },
       );
   static MaterialColor get primaryMaterialColor => MaterialColor(
-        Vx.getColorFromHex(colorEnv('primaryColor')),
+        _safeHexInt('primaryColor', 0xFF5E17EB),
         <int, Color>{
-          50: Vx.hexToColor(colorEnv('primaryColor')),
-          100: Vx.hexToColor(colorEnv('primaryColor')),
-          200: Vx.hexToColor(colorEnv('primaryColor')),
-          300: Vx.hexToColor(colorEnv('primaryColor')),
-          400: Vx.hexToColor(colorEnv('primaryColor')),
-          500: Vx.hexToColor(colorEnv('primaryColor')),
-          600: Vx.hexToColor(colorEnv('primaryColor')),
+          50: primaryColor,
+          100: primaryColor,
+          200: primaryColor,
+          300: primaryColor,
+          400: primaryColor,
+          500: primaryColor,
+          600: primaryColor,
           700: Vx.hexToColor(colorEnv('primaryColor')),
           800: Vx.hexToColor(colorEnv('primaryColor')),
           900: Vx.hexToColor(colorEnv('primaryColor')),
@@ -105,28 +124,39 @@ class AppColor {
 
   //saving
   static Future<bool> saveColorsToLocalStorage(String colorsMap) async {
-    return await LocalStorageService.prefs!
-        .setString(AppStrings.appColors, colorsMap);
+    try {
+      appColorsObject = jsonDecode(colorsMap);
+    } catch (e) {
+      print("Error decoding colors map: $e");
+    }
+    return await LocalStorageService.prefs
+        ?.setString(AppStrings.appColors, colorsMap) ?? false;
   }
 
   static dynamic appColorsObject;
-  static Future<void> getColorsFromLocalStorage() async {
-    appColorsObject =
-        LocalStorageService.prefs!.getString(AppStrings.appColors);
-    if (appColorsObject != null) {
-      appColorsObject = jsonDecode(appColorsObject);
+  static void getColorsFromLocalStorage() {
+    try {
+      if (appColorsObject != null) return;
+      final colorsStr = LocalStorageService.prefs?.getString(AppStrings.appColors);
+      if (colorsStr != null && colorsStr.isNotEmpty) {
+        appColorsObject = jsonDecode(colorsStr);
+      }
+    } catch (e) {
+      print("Error reading colors from local storage: $e");
     }
   }
 
   static String colorEnv(String colorRef) {
-    //
-    getColorsFromLocalStorage();
-    //
-    final selectedColor =
-        appColorsObject != null ? appColorsObject[colorRef] : "#000000";
-    if (selectedColor == null || selectedColor.toString().isEmpty) {
+    try {
+      getColorsFromLocalStorage();
+      final selectedColor =
+          appColorsObject != null ? appColorsObject[colorRef] : "#000000";
+      if (selectedColor == null || selectedColor.toString().isEmpty) {
+        return "#000000";
+      }
+      return selectedColor.toString();
+    } catch (_) {
       return "#000000";
     }
-    return selectedColor.toString();
   }
 }

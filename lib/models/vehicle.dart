@@ -39,22 +39,37 @@ class Vehicle {
 
   factory Vehicle.fromJson(Map<String, dynamic> json) {
     return Vehicle(
-      id: json["id"],
-      carModelId: json["car_model_id"],
-      driverId: json["driver_id"],
-      vehicleTypeId: json["vehicle_type_id"],
-      regNo: json["reg_no"],
-      color: json["color"],
+      id: json["id"] ?? 0,
+      carModelId: json["car_model_id"] ?? 0,
+      driverId: json["driver_id"] ?? 0,
+      vehicleTypeId: json["vehicle_type_id"] ?? 0,
+      regNo: json["reg_no"] ?? "",
+      color: json["color"] ?? "",
       isActive: json["is_active"] == null
           ? 0
           : (json["is_active"] is bool)
               ? json["is_active"]
                   ? 1
                   : 0
-              : json["is_active"] ?? 0,
+              : int.tryParse(json["is_active"].toString()) ?? 0,
       photo: (json["photo"] ?? "").toString().replaceAll("///mahila-sarthi.mytechbro.com//", "/").replaceAll("mahila-sarthi.mytechbro.com/mahila-sarthi.mytechbro.com", "mahila-sarthi.mytechbro.com"),
-      carModel: CarModel.fromJson(json["car_model"]),
-      vehicleType: VehicleType.fromJson(json["vehicle_type"]),
+      carModel: json["car_model"] != null
+          ? CarModel.fromJson(json["car_model"])
+          : CarModel(id: 0, name: "", carMakeId: 0, carMake: null),
+      vehicleType: json["vehicle_type"] != null
+          ? VehicleType.fromJson(json["vehicle_type"])
+          : VehicleType(
+              id: 0,
+              name: "",
+              slug: "",
+              baseFare: 0.0,
+              distanceFare: 0.0,
+              timeFare: 0.0,
+              minFare: 0.0,
+              isActive: 0,
+              formattedDate: "",
+              photo: "",
+            ),
       verified: json["verified"] ?? false,
     );
   }
@@ -88,9 +103,9 @@ class CarModel {
   CarMake? carMake;
 
   factory CarModel.fromJson(Map<String, dynamic> json) => CarModel(
-        id: json["id"],
-        name: json["name"],
-        carMakeId: json["car_make_id"],
+        id: json["id"] ?? 0,
+        name: json["name"] ?? "",
+        carMakeId: json["car_make_id"] ?? 0,
         carMake: json["car_make"] != null
             ? CarMake.fromJson(json["car_make"])
             : null,
@@ -114,8 +129,8 @@ class CarMake {
   String name;
 
   factory CarMake.fromJson(Map<String, dynamic> json) => CarMake(
-        id: json["id"],
-        name: json["name"],
+        id: json["id"] ?? 0,
+        name: json["name"] ?? "",
       );
 
   Map<String, dynamic> toJson() => {
@@ -149,18 +164,33 @@ class VehicleType {
   String formattedDate;
   String photo;
 
-  factory VehicleType.fromJson(Map<String, dynamic> json) => VehicleType(
-        id: json["id"],
-        name: json["name"],
-        slug: json["slug"],
-        baseFare: json["base_fare"].toString().toDouble()!,
-        distanceFare: json["distance_fare"].toString().toDouble()!,
-        timeFare: json["time_fare"].toString().toDouble()!,
-        minFare: json["min_fare"].toString().toDouble()!,
-        isActive: json["is_active"],
-        formattedDate: json["formatted_date"],
-        photo: (json["photo"] ?? "").toString().replaceAll("///mahila-sarthi.mytechbro.com//", "/").replaceAll("mahila-sarthi.mytechbro.com/mahila-sarthi.mytechbro.com", "mahila-sarthi.mytechbro.com"),
-      );
+  factory VehicleType.fromJson(Map<String, dynamic> json) {
+    String rawPhoto = (json["photo"] ?? "").toString();
+    if (rawPhoto.isNotEmpty) {
+      rawPhoto = rawPhoto
+          .replaceAll("mahila-sarthi.mytechbro.com", "admin.mahilasaarthi.in")
+          .replaceAll("///admin.mahilasaarthi.in//", "admin.mahilasaarthi.in/")
+          .replaceAll("https://admin.mahilasaarthi.in//", "https://admin.mahilasaarthi.in/");
+      if (!rawPhoto.startsWith("http")) {
+        if (!rawPhoto.startsWith("/")) {
+          rawPhoto = "/$rawPhoto";
+        }
+        rawPhoto = "https://admin.mahilasaarthi.in$rawPhoto";
+      }
+    }
+    return VehicleType(
+      id: json["id"] ?? 0,
+      name: json["name"] ?? "",
+      slug: json["slug"] ?? "",
+      baseFare: (json["base_fare"] ?? "0").toString().toDouble() ?? 0.0,
+      distanceFare: (json["distance_fare"] ?? "0").toString().toDouble() ?? 0.0,
+      timeFare: (json["time_fare"] ?? "0").toString().toDouble() ?? 0.0,
+      minFare: (json["min_fare"] ?? "0").toString().toDouble() ?? 0.0,
+      isActive: json["is_active"] ?? 0,
+      formattedDate: json["formatted_date"] ?? "",
+      photo: rawPhoto,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,

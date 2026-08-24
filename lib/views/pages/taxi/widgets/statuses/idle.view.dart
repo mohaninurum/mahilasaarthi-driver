@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mahilasaarthi/constants/app_images.dart';
 import 'package:mahilasaarthi/services/auth.service.dart';
 import 'package:mahilasaarthi/utils/ui_spacer.dart';
 import 'package:mahilasaarthi/view_models/taxi/taxi.vm.dart';
@@ -55,11 +56,14 @@ class IdleTaxiView extends StatelessWidget {
                       HStack(
                         [
                           CustomImage(
-                                  imageUrl: AuthServices
-                                      .driverVehicle!.vehicleType.photo)
-                              .wh(32, 32),
-                          UiSpacer.hSpace(5),
-                          "${AuthServices.driverVehicle!.vehicleType.name}"
+                            imageUrl: AuthServices
+                                .driverVehicle?.vehicleType?.photo ?? "",
+                            height: 36,
+                            width: 36,
+                            boxFit: BoxFit.contain,
+                          ),
+                          UiSpacer.hSpace(8),
+                          "${AuthServices.driverVehicle?.vehicleType?.name ?? ''}"
                               .text
                               .xl
                               .semiBold
@@ -71,7 +75,7 @@ class IdleTaxiView extends StatelessWidget {
                       "Vehicle Details".tr().text.thin.make(),
                       HStack(
                         [
-                          "${AuthServices.driverVehicle?.carModel.carMake?.name} (${AuthServices.driverVehicle?.carModel.name}) - ${AuthServices.driverVehicle?.regNo} - ${AuthServices.driverVehicle?.color.toUpperCase()}"
+                          "${AuthServices.driverVehicle?.carModel?.carMake?.name ?? ''} (${AuthServices.driverVehicle?.carModel?.name ?? ''}) - ${AuthServices.driverVehicle?.regNo ?? ''} - ${(AuthServices.driverVehicle?.color ?? '').toUpperCase()}"
                               .text
                               .xl
                               .semiBold

@@ -12,41 +12,41 @@ import 'local_storage.service.dart';
 class AuthServices {
   //
   static bool firstTimeOnApp() {
-    return LocalStorageService.prefs!.getBool(AppStrings.firstTimeOnApp) ??
+    return LocalStorageService.prefs?.getBool(AppStrings.firstTimeOnApp) ??
         true;
   }
 
   static firstTimeCompleted() async {
-    await LocalStorageService.prefs!.setBool(AppStrings.firstTimeOnApp, false);
+    await LocalStorageService.prefs?.setBool(AppStrings.firstTimeOnApp, false);
   }
 
   //
   static bool authenticated() {
-    return LocalStorageService.prefs!.getBool(AppStrings.authenticated) ??
+    return LocalStorageService.prefs?.getBool(AppStrings.authenticated) ??
         false;
   }
 
-  static Future<bool> isAuthenticated() {
-    return LocalStorageService.prefs!.setBool(AppStrings.authenticated, true);
+  static Future<bool> isAuthenticated() async {
+    return await LocalStorageService.prefs?.setBool(AppStrings.authenticated, true) ?? false;
   }
 
   // Token
   static Future<String> getAuthBearerToken() async {
-    return LocalStorageService.prefs!.getString(AppStrings.userAuthToken) ?? "";
+    return LocalStorageService.prefs?.getString(AppStrings.userAuthToken) ?? "";
   }
 
   static Future<bool> setAuthBearerToken(token) async {
-    return LocalStorageService.prefs!
-        .setString(AppStrings.userAuthToken, token);
+    return await LocalStorageService.prefs
+        ?.setString(AppStrings.userAuthToken, token) ?? false;
   }
 
   //Locale
   static String getLocale() {
-    return LocalStorageService.prefs!.getString(AppStrings.appLocale) ?? "en";
+    return LocalStorageService.prefs?.getString(AppStrings.appLocale) ?? "en";
   }
 
   static Future<bool> setLocale(language) async {
-    return LocalStorageService.prefs!.setString(AppStrings.appLocale, language);
+    return await LocalStorageService.prefs?.setString(AppStrings.appLocale, language) ?? false;
   }
 
   //
@@ -55,7 +55,7 @@ class AuthServices {
   static Future<User> getCurrentUser({bool force = false}) async {
     if (currentUser == null || force) {
       final userStringObject =
-          await LocalStorageService.prefs!.getString(AppStrings.userKey);
+          LocalStorageService.prefs?.getString(AppStrings.userKey);
       final userObject = json.decode(userStringObject ?? "{}");
       currentUser = User.fromJson(userObject);
     }
@@ -66,25 +66,32 @@ class AuthServices {
   ///
   ///
   static Future<User> saveUser(dynamic jsonObject) async {
-    final currentUser = User.fromJson(jsonObject);
+    currentUser = User.fromJson(jsonObject);
+    if (jsonObject is Map && jsonObject["vehicle"] != null) {
+      try {
+        await saveVehicle(jsonObject["vehicle"]);
+      } catch (e) {
+        print("saveVehicle from saveUser error ==> $e");
+      }
+    }
     try {
-      await LocalStorageService.prefs!.setString(
+      await LocalStorageService.prefs?.setString(
         AppStrings.userKey,
         json.encode(
-          currentUser.toJson(),
+          currentUser!.toJson(),
         ),
       );
 
       //subscribe to firebase topic
-      FirebaseService().firebaseMessaging.subscribeToTopic("${currentUser.id}");
+      FirebaseService().firebaseMessaging.subscribeToTopic("${currentUser!.id}");
       FirebaseService()
           .firebaseMessaging
-          .subscribeToTopic("d_${currentUser.id}");
+          .subscribeToTopic("d_${currentUser!.id}");
       FirebaseService()
           .firebaseMessaging
-          .subscribeToTopic("${currentUser.role}");
+          .subscribeToTopic("${currentUser!.role}");
 
-      return currentUser;
+      return currentUser!;
     } catch (error) {
       print("saveUser error ==> $error");
       throw error;
@@ -96,8 +103,8 @@ class AuthServices {
   static Vehicle? driverVehicle;
   static Future<Vehicle?> getDriverVehicle({bool force = false}) async {
     if (driverVehicle == null || force) {
-      final vehicleStringObject = await LocalStorageService.prefs!
-          .getString(AppStrings.driverVehicleKey);
+      final vehicleStringObject = LocalStorageService.prefs
+          ?.getString(AppStrings.driverVehicleKey);
       //
       if (vehicleStringObject == null || vehicleStringObject.isEmpty) {
         driverVehicle = null;
@@ -113,18 +120,18 @@ class AuthServices {
   ///
   ///
   static Future<Vehicle> saveVehicle(dynamic jsonObject) async {
-    final driverVehicle = Vehicle.fromJson(jsonObject);
+    driverVehicle = Vehicle.fromJson(jsonObject);
     try {
       //
-      await LocalStorageService.prefs!.setString(
+      await LocalStorageService.prefs?.setString(
         AppStrings.driverVehicleKey,
         json.encode(
-          driverVehicle.toJson(),
+          driverVehicle!.toJson(),
         ),
       );
       //sync vehicle data with free,is_online status with firebase
 
-      return driverVehicle;
+      return driverVehicle!;
     } catch (error) {
       print("saveVehicle error ==> $error");
       throw error;
@@ -135,18 +142,24 @@ class AuthServices {
   ///
   //
   static logout() async {
-    await HttpService().getCacheManager().clearAll();
-    await LocalStorageService.prefs!.clear();
-    await LocalStorageService.prefs!.setBool(AppStrings.firstTimeOnApp, false);
-    FirebaseService()
-        .firebaseMessaging
-        .unsubscribeFromTopic("${currentUser?.id}");
-    FirebaseService()
-        .firebaseMessaging
-        .unsubscribeFromTopic("d_${currentUser?.id}");
-    FirebaseService()
-        .firebaseMessaging
-        .unsubscribeFromTopic("${currentUser?.role}");
+    try {
+      await HttpService().getCacheManager().clearAll();
+    } catch (_) {}
+    try {
+      await LocalStorageService.prefs?.clear();
+      await LocalStorageService.prefs?.setBool(AppStrings.firstTimeOnApp, false);
+    } catch (_) {}
+    try {
+      FirebaseService()
+          .firebaseMessaging
+          .unsubscribeFromTopic("${currentUser?.id}");
+      FirebaseService()
+          .firebaseMessaging
+          .unsubscribeFromTopic("d_${currentUser?.id}");
+      FirebaseService()
+          .firebaseMessaging
+          .unsubscribeFromTopic("${currentUser?.role}");
+    } catch (_) {}
   }
 
   //

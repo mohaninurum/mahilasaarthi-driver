@@ -322,7 +322,13 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         //everything works well
         //firebase auth
         final fbToken = apiResponse.body["fb_token"];
-        await FirebaseAuth.instance.signInWithCustomToken(fbToken);
+        if (fbToken != null && fbToken.toString().trim().isNotEmpty) {
+          try {
+            await FirebaseAuth.instance.signInWithCustomToken(fbToken.toString());
+          } catch (fbError) {
+            print("Firebase custom token login error: $fbError");
+          }
+        }
         final driver = await AuthServices.saveUser(apiResponse.body["user"]);
         if (driver.isTaxiDriver && apiResponse.body["vehicle"] != null) {
           await AuthServices.saveVehicle(apiResponse.body["vehicle"]);
@@ -331,11 +337,10 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         await AuthServices.setAuthBearerToken(apiResponse.body["token"]);
         await AuthServices.isAuthenticated();
 
-        // Navigator.of(viewContext).pushNamedAndRemoveUntil(
-        //   AppRoutes.homeRoute,
-        //   (route) => false,
-        // );
-        viewContext.nextAndRemoveUntilPage(PermissionPage());
+        Navigator.of(viewContext).pushNamedAndRemoveUntil(
+          AppRoutes.homeRoute,
+          (route) => false,
+        );
       }
     } on FirebaseAuthException catch (error) {
       CoolAlert.show(

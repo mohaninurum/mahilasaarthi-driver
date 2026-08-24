@@ -31,6 +31,14 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
   void initState() {
     super.initState();
     taxiViewModel ??= TaxiViewModel(context);
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    taxiViewModel?.dispose();
+    super.dispose();
   }
 
   @override
@@ -44,6 +52,7 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
     return BasePage(
       body: ViewModelBuilder<TaxiViewModel>.reactive(
         viewModelBuilder: () => taxiViewModel!,
+        disposeViewModel: false,
         onViewModelReady: (vm) => vm.initialise(),
         builder: (context, vm, child) {
           return Stack(

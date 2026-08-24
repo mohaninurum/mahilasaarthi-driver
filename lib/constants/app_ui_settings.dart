@@ -3,33 +3,37 @@ import 'package:mahilasaarthi/constants/app_strings.dart';
 class AppUISettings extends AppStrings {
   //CHAT UI
   static bool get canVendorChat {
-    if (AppStrings.env('ui') == null || AppStrings.env('ui')["chat"] == null) {
+    final ui = AppStrings.env('ui');
+    if (ui is! Map || ui["chat"] is! Map) {
       return true;
     }
-    return AppStrings.env('ui')['chat']["canVendorChat"] == "1";
+    return ui['chat']["canVendorChat"] == "1";
   }
 
   static bool get canCustomerChat {
-    if (AppStrings.env('ui') == null || AppStrings.env('ui')["chat"] == null) {
+    final ui = AppStrings.env('ui');
+    if (ui is! Map || ui["chat"] is! Map) {
       return true;
     }
-    return AppStrings.env('ui')['chat']["canCustomerChat"] == "1";
+    return ui['chat']["canCustomerChat"] == "1";
   }
 
   static bool get canDriverChat {
-    if (AppStrings.env('ui') == null || AppStrings.env('ui')["chat"] == null) {
+    final ui = AppStrings.env('ui');
+    if (ui is! Map || ui["chat"] is! Map) {
       return true;
     }
-    return AppStrings.env('ui')['chat']["canDriverChat"] == "1";
+    return ui['chat']["canDriverChat"] == "1";
   }
 
   static bool get canDriverChatSupportMedia {
-    if (AppStrings.env('ui') == null || AppStrings.env('ui')["chat"] == null) {
+    final ui = AppStrings.env('ui');
+    if (ui is! Map || ui["chat"] is! Map) {
       return true;
     }
     try {
       dynamic isSupportMedia =
-          AppStrings.env('ui')['chat']["canDriverChatSupportMedia"] ?? false;
+          ui['chat']["canDriverChatSupportMedia"] ?? false;
       return (isSupportMedia is bool
           ? isSupportMedia
           : int.parse("$isSupportMedia") == 1);
@@ -39,33 +43,35 @@ class AppUISettings extends AppStrings {
   }
 
   static bool get enableDriverTypeSwitch {
-    if (AppStrings.env('enableDriverTypeSwitch') == null) {
+    final canSwitch = AppStrings.env('enableDriverTypeSwitch');
+    if (canSwitch == null) {
       return false;
     }
-    final canSwitch = AppStrings.env('enableDriverTypeSwitch');
     if (canSwitch is bool) {
       return canSwitch;
     } else if (canSwitch is int) {
       return canSwitch == 1;
     } else {
-      return int.parse("$canSwitch") == 1;
+      return int.tryParse("$canSwitch") == 1;
     }
   }
 
   //call
   static bool get canCallVendor {
-    if (AppStrings.env('ui') == null || AppStrings.env('ui')["call"] == null) {
+    final ui = AppStrings.env('ui');
+    if (ui is! Map || ui["call"] is! Map) {
       return true;
     }
     return [1, "1"]
-        .contains(AppStrings.env('ui')['call']["canDriverVendorCall"]);
+        .contains(ui['call']["canDriverVendorCall"]);
   }
 
   static bool get canCallCustomer {
-    if (AppStrings.env('ui') == null || AppStrings.env('ui')["call"] == null) {
+    final ui = AppStrings.env('ui');
+    if (ui is! Map || ui["call"] is! Map) {
       return true;
     }
     return [1, "1"]
-        .contains(AppStrings.env('ui')['call']["canCustomerDriverCall"]);
+        .contains(ui['call']["canCustomerDriverCall"]);
   }
 }

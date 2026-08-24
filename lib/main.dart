@@ -7,6 +7,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
+import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
+import 'package:mahilasaarthi/constants/app_colors.dart';
 import 'package:mahilasaarthi/my_app.dart';
 import 'package:mahilasaarthi/services/general_app.service.dart';
 import 'package:mahilasaarthi/services/local_storage.service.dart';
@@ -29,25 +32,63 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 //   }
 // }
 
-// @pragma("vm:entry-point")
-// void overlayMain() {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   runApp(
-//     const MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       home: FloatingAppBubble(),
-//     ),
-//   );
-// }
+@pragma("vm:entry-point")
+void overlayMain() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: FloatingAppBubble(),
+    ),
+  );
+}
 
 // Global flag to check if translator initialized successfully
 bool _translatorReady = false;
 
+@pragma("vm:entry-point")
 void main() async {
   await runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
-      
+
+      // Initialize Google Maps Renderer (Latest) to prevent legacy platform view surface crashes
+      final GoogleMapsFlutterPlatform mapsImplementation =
+          GoogleMapsFlutterPlatform.instance;
+      if (mapsImplementation is GoogleMapsFlutterAndroid) {
+        try {
+          await mapsImplementation
+              .initializeWithRenderer(AndroidMapRenderer.latest);
+        } catch (e) {
+          print("Google Maps Android Renderer init error: $e");
+        }
+      }
+
+      // Custom ErrorWidget.builder to prevent Grey Screen of Death in Release Mode / Play Console
+      ErrorWidget.builder = (FlutterErrorDetails details) {
+        print("Flutter Release Error caught by builder: ${details.exception}");
+        return Material(
+          color: Colors.white,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/images/app_icon.png',
+                  width: 100,
+                  height: 100,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.drive_eta, size: 80, color: Colors.blue),
+                ),
+                const SizedBox(height: 20),
+                const CircularProgressIndicator(),
+                Text('${details.exception}\n"${details.stack}'),
+              ],
+            ),
+          ),
+        );
+      };
+
       try {
         // setting up firebase notifications
         await Firebase.initializeApp();
@@ -56,8 +97,16 @@ void main() async {
       }
 
       try {
+        await LocalStorageService.getPrefs();
+        AppColor.getColorsFromLocalStorage();
+      } catch (e) {
+        print("LocalStorageService init error: $e");
+      }
+
+      try {
         await translator.init(
           localeType: LocalizationDefaultType.asDefined,
+          language: 'en',
           languagesList: AppLanguages.codes,
           assetsDirectory: 'assets/lang/',
         );
@@ -65,12 +114,6 @@ void main() async {
       } catch (e) {
         print("Translator init error: $e");
         _translatorReady = false;
-      }
-      
-      try {
-        await LocalStorageService.getPrefs();
-      } catch (e) {
-        print("LocalStorageService init error: $e");
       }
 
       try {
@@ -110,9 +153,6 @@ void main() async {
   );
 }
 
-
-
-
 class LifecycleEventHandler extends WidgetsBindingObserver {
   final AsyncCallback resumeCallBack;
   final AsyncCallback suspendingCallBack;
@@ -129,7 +169,7 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
     print('state >>>>>>>>>>>>>>>>>>>>>> : ${state}');
     switch (state) {
       case AppLifecycleState.resumed:
-          await resumeCallBack();
+        await resumeCallBack();
         break;
       case AppLifecycleState.inactive:
         await suspendingCallBack();

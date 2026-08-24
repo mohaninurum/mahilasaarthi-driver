@@ -3,6 +3,7 @@ import 'package:flutter_overboard/flutter_overboard.dart';
 import 'package:mahilasaarthi/constants/app_images.dart';
 import 'package:mahilasaarthi/constants/app_routes.dart';
 import 'package:mahilasaarthi/requests/settings.request.dart';
+import 'package:mahilasaarthi/services/app.service.dart';
 import 'package:mahilasaarthi/services/auth.service.dart';
 import 'package:mahilasaarthi/utils/ui_spacer.dart';
 import 'package:mahilasaarthi/utils/utils.dart';
@@ -64,9 +65,10 @@ class OnboardingViewModel extends MyBaseViewModel {
     setBusy(true);
     try {
       final apiResponse = await SettingsRequest().appOnboardings();
+      final listData = apiResponse.data;
       //load the data
-      if (apiResponse.allGood) {
-        final mOnBoardDatas = (apiResponse.body as List).map(
+      if (apiResponse.allGood && listData is List && listData.isNotEmpty) {
+        final mOnBoardDatas = listData.map(
           (e) {
             return PageModel.withChild(
               child: VStack(
@@ -94,22 +96,37 @@ class OnboardingViewModel extends MyBaseViewModel {
         if (mOnBoardDatas.isNotEmpty) {
           onBoardData = mOnBoardDatas;
         }
-      } else {
-        toastError("${apiResponse.message}");
       }
     } catch (error) {
-      toastError("$error");
+      print("Error loading onboarding data: $error");
+    } finally {
+      setBusy(false);
+      finishLoading();
     }
-    setBusy(false);
-    finishLoading();
   }
 
   void onDonePressed() async {
-    //
-    await AuthServices.firstTimeCompleted();
-    Navigator.of(viewContext).pushNamedAndRemoveUntil(
-      AppRoutes.loginRoute,
-      (route) => false,
-    );
+    try {
+      await AuthServices.firstTimeCompleted();
+    } catch (e) {
+      print("Error marking first time completed: $e");
+    }
+
+    try {
+      final navState = AppService().navigatorKey.currentState;
+      if (navState != null) {
+        navState.pushNamedAndRemoveUntil(
+          AppRoutes.loginRoute,
+          (route) => false,
+        );
+      } else {
+        Navigator.of(viewContext).pushNamedAndRemoveUntil(
+          AppRoutes.loginRoute,
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      print("Error navigating from onboarding: $e");
+    }
   }
 }
