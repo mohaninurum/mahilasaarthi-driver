@@ -11,6 +11,7 @@ import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
 import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
 import 'package:mahilasaarthi/constants/app_colors.dart';
 import 'package:mahilasaarthi/my_app.dart';
+import 'package:mahilasaarthi/services/auth.service.dart';
 import 'package:mahilasaarthi/services/general_app.service.dart';
 import 'package:mahilasaarthi/services/local_storage.service.dart';
 import 'package:mahilasaarthi/services/firebase.service.dart';
@@ -48,9 +49,9 @@ bool _translatorReady = false;
 
 @pragma("vm:entry-point")
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await runZonedGuarded(
     () async {
-      WidgetsFlutterBinding.ensureInitialized();
 
       // Initialize Google Maps Renderer (Latest) to prevent legacy platform view surface crashes
       final GoogleMapsFlutterPlatform mapsImplementation =
@@ -104,9 +105,11 @@ void main() async {
       }
 
       try {
+        final savedLocale = AuthServices.getLocale();
+        final initialLang = (savedLocale.isNotEmpty && savedLocale != "null") ? savedLocale : 'en';
         await translator.init(
           localeType: LocalizationDefaultType.asDefined,
-          language: 'en',
+          language: initialLang,
           languagesList: AppLanguages.codes,
           assetsDirectory: 'assets/lang/',
         );

@@ -31,25 +31,42 @@ class User {
     this.deleteRequest = false,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) => User(
-        id: json['id'],
-        name: json['name'],
-        email: json['email'],
-        phone: json['phone'],
-        photo: (json['photo'] ?? "").toString().replaceAll("///mahila-sarthi.mytechbro.com//", "/").replaceAll("mahila-sarthi.mytechbro.com/mahila-sarthi.mytechbro.com", "mahila-sarthi.mytechbro.com"),
-        role: json['role_name'] ?? "client",
-        vendorId: json['vendor_id'],
-        rating: json['rating'].toString().toDouble() ?? 5.00,
-        isOnline: (json['is_online'].toString().toInt() ?? 0) == 1,
-        isTaxiDriver: (json['is_taxi_driver'].toString().toInt() ?? 0) == 1,
-        documentRequested: json["document_requested"] == null
-            ? false
-            : json["document_requested"],
-        pendingDocumentApproval: json["pending_document_approval"] == null
-            ? false
-            : json["pending_document_approval"],
-        deleteRequest: (json['delete_request'].toString().toInt() ?? 0) == 1,
-      );
+  factory User.fromJson(Map<String, dynamic> json) {
+    Map<String, dynamic> userMap = json;
+    if (json.containsKey("user") && json["user"] is Map<String, dynamic>) {
+      userMap = json["user"];
+    } else if (json.containsKey("data") && json["data"] is Map<String, dynamic>) {
+      if (json["data"].containsKey("user") && json["data"]["user"] is Map<String, dynamic>) {
+        userMap = json["data"]["user"];
+      } else {
+        userMap = json["data"];
+      }
+    }
+
+    return User(
+      id: int.tryParse(userMap['id']?.toString() ?? "0") ?? 0,
+      name: userMap['name']?.toString() ?? "",
+      email: userMap['email']?.toString(),
+      phone: userMap['phone']?.toString(),
+      photo: (userMap['photo'] ?? "")
+          .toString()
+          .replaceAll("///mahila-sarthi.mytechbro.com//", "/")
+          .replaceAll("mahila-sarthi.mytechbro.com/mahila-sarthi.mytechbro.com", "mahila-sarthi.mytechbro.com"),
+      role: userMap['role_name']?.toString() ?? userMap['role']?.toString() ?? "driver",
+      vendorId: userMap['vendor_id'] != null ? int.tryParse(userMap['vendor_id'].toString()) : null,
+      rating: double.tryParse(userMap['rating']?.toString() ?? "5.0") ?? 5.0,
+      isOnline: userMap['is_online'] == true ||
+          userMap['is_online']?.toString() == "1" ||
+          userMap['is_online']?.toString().toLowerCase() == "true",
+      isTaxiDriver: userMap['is_taxi_driver'] == true ||
+          userMap['is_taxi_driver']?.toString() == "1" ||
+          userMap['is_taxi_driver']?.toString().toLowerCase() == "true" ||
+          userMap['is_taxi_driver'] == null,
+      documentRequested: userMap["document_requested"] == true || userMap["document_requested"].toString() == "1",
+      pendingDocumentApproval: userMap["pending_document_approval"] == true || userMap["pending_document_approval"].toString() == "1",
+      deleteRequest: (int.tryParse(userMap['delete_request']?.toString() ?? "0") ?? 0) == 1,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {

@@ -1,17 +1,37 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageService {
-  static SharedPreferences? prefs;
+  static SharedPreferences? _prefs;
+  static bool _isInitializing = false;
 
   static Future<SharedPreferences?> getPrefs() async {
-    try {
-      if (prefs == null) {
-        prefs = await SharedPreferences.getInstance();
+    if (_prefs != null) return _prefs;
+    
+    if (_isInitializing) {
+      int retries = 0;
+      while (_isInitializing && retries < 20) {
+        await Future.delayed(const Duration(milliseconds: 100));
+        retries++;
       }
-    } catch (error) {
-      print("Error Getting SharedPreference => $error");
+      if (_prefs != null) return _prefs;
     }
-    // prefs.clear();
-    return prefs;
+
+    _isInitializing = true;
+    try {
+      _prefs = await SharedPreferences.getInstance();
+    } catch (error) {
+      print("LocalStorageService: First attempt error => $error. Retrying in 200ms...");
+      await Future.delayed(const Duration(milliseconds: 200));
+      try {
+        _prefs = await SharedPreferences.getInstance();
+      } catch (retryError) {
+        print("LocalStorageService: Retry error => $retryError");
+      }
+    } finally {
+      _isInitializing = false;
+    }
+    return _prefs;
   }
+
+  static SharedPreferences? get prefs => _prefs;
 }

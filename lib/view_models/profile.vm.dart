@@ -33,7 +33,6 @@ class ProfileViewModel extends MyBaseViewModel {
   }
 
   void initialise() async {
-    //
     PackageInfo.fromPlatform().then((packageInfo) {
       String versionName = packageInfo.version;
       String versionCode = packageInfo.buildNumber;
@@ -43,11 +42,19 @@ class ProfileViewModel extends MyBaseViewModel {
       print("Error loading package info: $error");
     });
 
-    setBusy(true);
     try {
       currentUser = await AuthServices.getCurrentUser(force: true);
+      notifyListeners();
     } catch (error) {
-      print("Error loading user: $error");
+      print("Error loading local user: $error");
+    }
+
+    try {
+      final updatedUser = await _authRequest.getMyDetails();
+      currentUser = updatedUser;
+      notifyListeners();
+    } catch (error) {
+      print("Error fetching updated profile in ProfileViewModel ==> $error");
     }
     setBusy(false);
   }

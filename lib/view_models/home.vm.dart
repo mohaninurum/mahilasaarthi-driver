@@ -50,21 +50,25 @@ class HomeViewModel extends MyBaseViewModel with UpdateService {
     currentUser = await AuthServices.getCurrentUser();
     driverVehicle = await AuthServices.getDriverVehicle();
     //
+    final prefs = await LocalStorageService.getPrefs();
     AppService().driverIsOnline =
-        LocalStorageService.prefs!.getBool(AppStrings.onlineOnApp) ?? false;
+        prefs?.getBool(AppStrings.onlineOnApp) ?? false;
     notifyListeners();
 
     try {
       final updatedUser = await authRequest.getMyDetails();
-      await AuthServices.saveUser(updatedUser.toJson());
-      currentUser = await AuthServices.getCurrentUser(force: true);
+      currentUser = updatedUser;
       notifyListeners();
     } catch (error) {
       print("Error fetching updated profile ==> $error");
     }
 
     //
-    await OrderManagerService().monitorOnlineStatusListener();
+    try {
+      await OrderManagerService().monitorOnlineStatusListener();
+    } catch (error) {
+      print("Error in monitorOnlineStatusListener ==> $error");
+    }
     notifyListeners();
 
     //
@@ -146,7 +150,8 @@ class HomeViewModel extends MyBaseViewModel with UpdateService {
       if (apiResponse.allGood) {
         //
         AppService().driverIsOnline = !AppService().driverIsOnline;
-        await LocalStorageService.prefs!.setBool(
+        final prefs = await LocalStorageService.getPrefs();
+        await prefs?.setBool(
           AppStrings.onlineOnApp,
           AppService().driverIsOnline,
         );

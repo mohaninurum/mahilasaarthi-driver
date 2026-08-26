@@ -150,11 +150,8 @@ class NotificationService {
     final notifications = await getNotifications();
     notifications.insert(0, notification);
 
-    //
-    if (LocalStorageService.prefs == null) {
-      await LocalStorageService.getPrefs();
-    }
-    await LocalStorageService.prefs!.setString(
+    final prefs = await LocalStorageService.getPrefs();
+    await prefs?.setString(
       AppStrings.notificationsKey,
       jsonEncode(notifications),
     );
@@ -165,7 +162,8 @@ class NotificationService {
     final notifications = await getNotifications();
     notifications.removeAt(notificationModel.index!);
     notifications.insert(notificationModel.index!, notificationModel);
-    await LocalStorageService.prefs!.setString(
+    final prefs = await LocalStorageService.getPrefs();
+    await prefs?.setString(
       AppStrings.notificationsKey,
       jsonEncode(notifications),
     );

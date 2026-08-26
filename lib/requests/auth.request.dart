@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:mahilasaarthi/constants/api.dart';
 import 'package:mahilasaarthi/models/api_response.dart';
 import 'package:mahilasaarthi/models/user.dart';
+import 'package:mahilasaarthi/services/auth.service.dart';
 import 'package:mahilasaarthi/services/http.service.dart';
 import 'package:mahilasaarthi/services/app.service.dart';
 import 'package:http/http.dart' as http;
@@ -235,11 +236,24 @@ class AuthRequest extends HttpService {
   }
 
   Future<User> getMyDetails() async {
-    //
     final apiResult = await get(Api.myProfile);
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
-      return User.fromJson(apiResponse.body);
+      dynamic userRaw = apiResponse.body["user"] ??
+          (apiResponse.body["data"] is Map
+              ? (apiResponse.body["data"]["user"] ?? apiResponse.body["data"])
+              : null) ??
+          apiResponse.body;
+      final userMap = userRaw is Map<String, dynamic>
+          ? userRaw
+          : Map<String, dynamic>.from(userRaw ?? {});
+      final user = User.fromJson(userMap);
+      try {
+        await AuthServices.saveUser(userMap);
+      } catch (e) {
+        print("Error saving profile details to local storage: $e");
+      }
+      return user;
     } else {
       throw "${apiResponse.message}";
     }

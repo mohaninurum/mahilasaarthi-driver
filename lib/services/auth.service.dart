@@ -23,8 +23,10 @@ class AuthServices {
 
   //
   static bool authenticated() {
-    final isAuth = LocalStorageService.prefs?.getBool(AppStrings.authenticated) ?? false;
-    final token = LocalStorageService.prefs?.getString(AppStrings.userAuthToken) ?? "";
+    final isAuth =
+        LocalStorageService.prefs?.getBool(AppStrings.authenticated) ?? false;
+    final token =
+        LocalStorageService.prefs?.getString(AppStrings.userAuthToken) ?? "";
     return isAuth && token.isNotEmpty;
   }
 
@@ -34,16 +36,22 @@ class AuthServices {
   }
 
   // Token
+  static String? _authToken;
+
   static Future<String> getAuthBearerToken() async {
+    if (_authToken != null && _authToken!.trim().isNotEmpty) {
+      return _authToken!;
+    }
     final prefs = await LocalStorageService.getPrefs();
-    final token = prefs?.getString(AppStrings.userAuthToken) ?? "";
-    return token;
+    _authToken = prefs?.getString(AppStrings.userAuthToken) ?? "";
+    return _authToken!;
   }
 
   static Future<bool> setAuthBearerToken(dynamic token) async {
     if (token == null) return false;
     final tokenStr = token.toString().trim();
     if (tokenStr.isEmpty) return false;
+    _authToken = tokenStr;
     final prefs = await LocalStorageService.getPrefs();
     return await prefs?.setString(AppStrings.userAuthToken, tokenStr) ?? false;
   }
@@ -76,11 +84,28 @@ class AuthServices {
   ///
   static Future<User> saveUser(dynamic jsonObject) async {
     currentUser = User.fromJson(jsonObject);
-    if (jsonObject is Map && jsonObject["vehicle"] != null) {
-      try {
-        await saveVehicle(jsonObject["vehicle"]);
-      } catch (e) {
-        print("saveVehicle from saveUser error ==> $e");
+    if (jsonObject is Map) {
+      String? token;
+      if (jsonObject["token"] != null && jsonObject["token"] is String) {
+        token = jsonObject["token"].toString();
+      } else if (jsonObject["access_token"] != null) {
+        token = jsonObject["access_token"].toString();
+      } else if (jsonObject["token"] is Map && jsonObject["token"]["token"] != null) {
+        token = jsonObject["token"]["token"].toString();
+      } else if (jsonObject["fb_token"] != null && jsonObject["fb_token"].toString().trim().isNotEmpty) {
+        token = jsonObject["fb_token"].toString();
+      }
+      if (token != null && token.trim().isNotEmpty) {
+        await setAuthBearerToken(token);
+        await isAuthenticated();
+      }
+
+      if (jsonObject["vehicle"] != null) {
+        try {
+          await saveVehicle(jsonObject["vehicle"]);
+        } catch (e) {
+          print("saveVehicle from saveUser error ==> $e");
+        }
       }
     }
     try {
@@ -93,13 +118,23 @@ class AuthServices {
       );
 
       //subscribe to firebase topic
-      FirebaseService().firebaseMessaging.subscribeToTopic("${currentUser!.id}");
-      FirebaseService()
-          .firebaseMessaging
-          .subscribeToTopic("d_${currentUser!.id}");
-      FirebaseService()
-          .firebaseMessaging
-          .subscribeToTopic("${currentUser!.role}");
+      try {
+        if (currentUser?.id != null) {
+          FirebaseService()
+              .firebaseMessaging
+              .subscribeToTopic("${currentUser!.id}");
+          FirebaseService()
+              .firebaseMessaging
+              .subscribeToTopic("d_${currentUser!.id}");
+        }
+        if (currentUser?.role != null && currentUser!.role.isNotEmpty) {
+          FirebaseService()
+              .firebaseMessaging
+              .subscribeToTopic("${currentUser!.role}");
+        }
+      } catch (fbError) {
+        print("Firebase topic subscribe error ==> $fbError");
+      }
 
       return currentUser!;
     } catch (error) {
@@ -151,6 +186,7 @@ class AuthServices {
   ///
   //
   static Future<void> logout() async {
+    _authToken = null;
     try {
       await HttpService().getCacheManager().clearAll();
     } catch (_) {}

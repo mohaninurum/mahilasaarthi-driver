@@ -213,7 +213,8 @@ class OrderManagerService {
       }
       //set the status to the backend
       if (shouldGoOffline) {
-        await LocalStorageService.prefs!.setBool(AppStrings.onlineOnApp, false);
+        final prefs = await LocalStorageService.getPrefs();
+        await prefs?.setBool(AppStrings.onlineOnApp, false);
         if (appService != null) {
           appService.driverIsOnline = false;
         } else {

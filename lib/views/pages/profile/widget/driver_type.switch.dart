@@ -57,7 +57,8 @@ class _DriverTypeSwitchState extends State<DriverTypeSwitch> {
         if (newUserModel.isTaxiDriver && vehicleJson != null) {
           await AuthServices.saveVehicle(vehicleJson);
         } else {
-          await LocalStorageService.prefs!.remove(AppStrings.driverVehicleKey);
+          final prefs = await LocalStorageService.getPrefs();
+          await prefs?.remove(AppStrings.driverVehicleKey);
         }
 
         await AuthServices.getCurrentUser(force: true);

@@ -1,13 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mahilasaarthi/constants/app_strings.dart';
 import 'package:mahilasaarthi/services/alert.service.dart';
+import 'package:mahilasaarthi/services/toast.service.dart';
 import 'package:mahilasaarthi/utils/utils.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class SOSButton extends StatelessWidget {
   const SOSButton({Key? key}) : super(key: key);
+
+  Future<void> _makeCall(String phoneNumber) async {
+    final cleanPhone = phoneNumber.trim();
+    if (cleanPhone.isEmpty) return;
+    final telUrl = "tel:$cleanPhone";
+
+    try {
+      if (await canLaunchUrlString(telUrl)) {
+        await launchUrlString(telUrl, mode: LaunchMode.externalApplication);
+      } else {
+        final uri = Uri.parse(telUrl);
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } on MissingPluginException catch (e) {
+      print("SOS MissingPluginException: $e");
+      ToastService.toastError("Platform plugin error. Please rebuild/restart app.".tr());
+    } catch (error) {
+      print("SOS Launch Error: $error");
+      try {
+        await launchUrl(Uri.parse(telUrl), mode: LaunchMode.externalApplication);
+      } catch (err) {
+        ToastService.toastError("Could not launch phone dialer: $cleanPhone");
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,12 +53,15 @@ class SOSButton extends StatelessWidget {
           .shadowXl
           .make()
           .onTap(
-        () {
+        () async {
           try {
             final contacts = AppStrings.emergencyContact.split(',').where((e) => e.trim().isNotEmpty).toList();
-            if (contacts.isEmpty) return;
+            if (contacts.isEmpty) {
+              ToastService.toastError("No emergency contacts found".tr());
+              return;
+            }
             if (contacts.length == 1) {
-              launchUrlString("tel:${contacts.first.trim()}");
+              await _makeCall(contacts.first);
             } else {
               showModalBottomSheet(
                 context: context,
@@ -41,9 +72,9 @@ class SOSButton extends StatelessWidget {
                       ...contacts.map((contact) => ListTile(
                         leading: Icon(Icons.phone),
                         title: contact.trim().text.make(),
-                        onTap: () {
+                        onTap: () async {
                           Navigator.pop(context);
-                          launchUrlString("tel:${contact.trim()}");
+                          await _makeCall(contact);
                         },
                       )).toList(),
                     ]),

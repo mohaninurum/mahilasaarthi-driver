@@ -308,9 +308,18 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
           text: apiResponse.message,
         );
       } else {
-        //check it the user is a driver
-        final user = User.fromJson(apiResponse.body["user"]);
-        if (user.role != "driver") {
+        dynamic userRaw = apiResponse.body["user"] ??
+            (apiResponse.body["data"] is Map
+                ? (apiResponse.body["data"]["user"] ?? apiResponse.body["data"])
+                : null) ??
+            apiResponse.body;
+
+        final userMap = userRaw is Map<String, dynamic>
+            ? userRaw
+            : Map<String, dynamic>.from(userRaw ?? {});
+
+        final user = User.fromJson(userMap);
+        if (user.role.toLowerCase() != "driver") {
           CoolAlert.show(
             context: viewContext,
             type: CoolAlertType.error,
@@ -319,9 +328,11 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
           );
           return;
         }
+
         //everything works well
-        //firebase auth
-        final fbToken = apiResponse.body["fb_token"];
+        // Extract and save tokens FIRST so all subsequent service calls have tokens
+        final fbToken = apiResponse.body["fb_token"] ??
+            (apiResponse.body["data"] is Map ? apiResponse.body["data"]["fb_token"] : null);
         if (fbToken != null && fbToken.toString().trim().isNotEmpty) {
           try {
             await FirebaseAuth.instance.signInWithCustomToken(fbToken.toString());
@@ -329,36 +340,56 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
             print("Firebase custom token login error: $fbError");
           }
         }
-        final driver = await AuthServices.saveUser(apiResponse.body["user"]);
-        if (driver.isTaxiDriver && apiResponse.body["vehicle"] != null) {
-          await AuthServices.saveVehicle(apiResponse.body["vehicle"]);
-          await AuthServices.syncDriverData(apiResponse.body);
-        }
 
-        // Robust token extraction
-        String token = "";
+        // Robust token extraction: prioritize main token over fb_token
+        String authTokenToSave = "";
         if (apiResponse.body is Map) {
           if (apiResponse.body["token"] != null && apiResponse.body["token"] is String) {
-            token = apiResponse.body["token"].toString();
+            authTokenToSave = apiResponse.body["token"].toString();
           } else if (apiResponse.body["access_token"] != null) {
-            token = apiResponse.body["access_token"].toString();
+            authTokenToSave = apiResponse.body["access_token"].toString();
           } else if (apiResponse.body["token"] is Map && apiResponse.body["token"]["token"] != null) {
-            token = apiResponse.body["token"]["token"].toString();
+            authTokenToSave = apiResponse.body["token"]["token"].toString();
           } else if (apiResponse.body["user"] is Map && apiResponse.body["user"]["token"] != null) {
-            token = apiResponse.body["user"]["token"].toString();
+            authTokenToSave = apiResponse.body["user"]["token"].toString();
+          } else if (apiResponse.body["data"] is Map) {
+            final dataMap = apiResponse.body["data"];
+            if (dataMap["token"] != null) {
+              authTokenToSave = dataMap["token"].toString();
+            } else if (dataMap["access_token"] != null) {
+              authTokenToSave = dataMap["access_token"].toString();
+            }
           }
         }
-        if (token.isNotEmpty) {
-          await AuthServices.setAuthBearerToken(token);
+
+        if (authTokenToSave.isEmpty && fbToken != null && fbToken.toString().trim().isNotEmpty) {
+          authTokenToSave = fbToken.toString().trim();
+        }
+
+        if (authTokenToSave.isNotEmpty) {
+          await AuthServices.setAuthBearerToken(authTokenToSave);
           await AuthServices.isAuthenticated();
         } else {
           print("WARNING: Login response did not contain a valid token! Body: ${apiResponse.body}");
+          await AuthServices.isAuthenticated();
         }
 
-        Navigator.of(viewContext).pushNamedAndRemoveUntil(
-          AppRoutes.homeRoute,
-          (route) => false,
-        );
+        final driver = await AuthServices.saveUser(userMap);
+
+        dynamic vehicleRaw = apiResponse.body["vehicle"] ??
+            (apiResponse.body["data"] is Map ? apiResponse.body["data"]["vehicle"] : null);
+
+        if (driver.isTaxiDriver && vehicleRaw != null) {
+          await AuthServices.saveVehicle(vehicleRaw);
+          await AuthServices.syncDriverData(apiResponse.body is Map<String, dynamic> ? apiResponse.body : {"user": userMap, "vehicle": vehicleRaw});
+        }
+
+        if (viewContext != null) {
+          Navigator.of(viewContext).pushNamedAndRemoveUntil(
+            AppRoutes.homeRoute,
+            (route) => false,
+          );
+        }
       }
     } on FirebaseAuthException catch (error) {
       CoolAlert.show(

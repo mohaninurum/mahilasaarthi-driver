@@ -57,24 +57,66 @@ class HttpService {
           (X509Certificate cert, String host, int port) => true;
       return client;
     };
-    dio.interceptors.add(getCacheManager().interceptor);
-    dio.interceptors.add(CurlLoggerInterceptor());
-    
+    try {
+      dio.interceptors.add(getCacheManager().interceptor);
+    } catch (e) {
+      print("DioCacheManager init error: $e");
+    }
     // Add interceptor for handling API requests/responses and 401 Unauthorized globally
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
           final userToken = await AuthServices.getAuthBearerToken();
+          String langCode = "en";
+          try {
+            langCode = translator.activeLocale.languageCode;
+          } catch (_) {
+            langCode = "en";
+          }
+          options.headers[HttpHeaders.acceptHeader] = "application/json";
+          options.headers["lang"] = langCode;
           if (userToken.isNotEmpty) {
             options.headers[HttpHeaders.authorizationHeader] = "Bearer $userToken";
+          }
+          try {
+            List<String> curlParts = ["curl -X ${options.method.toUpperCase()}"];
+            options.headers.forEach((k, v) {
+              if (k != 'cookie') {
+                curlParts.add("-H '$k: $v'");
+              }
+            });
+            if (options.data != null) {
+              if (options.data is FormData) {
+                curlParts.add("-d 'FormData...'");
+              } else {
+                try {
+                  curlParts.add("-d '${jsonEncode(options.data)}'");
+                } catch (_) {
+                  curlParts.add("-d '${options.data}'");
+                }
+              }
+            }
+            curlParts.add("'${options.uri.toString()}'");
+            print("\n==================== API CURL ====================");
+            print(curlParts.join(" \\\n  "));
+            print("==================================================\n");
+          } catch (e) {
+            print("Error generating cURL: $e");
           }
           return handler.next(options);
         },
         onResponse: (response, handler) async {
-          if (kDebugMode) {
-            print("🟢 API RESPONSE [${response.statusCode}] => ${response.requestOptions.path}");
-            print("Data: ${response.data}");
-            print("----------------------------------------------------------");
+          try {
+            print("\n==================== API RESPONSE [${response.statusCode}] ====================");
+            print("PATH: ${response.requestOptions.path}");
+            try {
+              print("RESPONSE BODY: ${jsonEncode(response.data)}");
+            } catch (_) {
+              print("RESPONSE BODY: ${response.data}");
+            }
+            print("=================================================================\n");
+          } catch (e) {
+            print("Error printing API response: $e");
           }
 
           if (response.statusCode == 401) {
@@ -105,11 +147,14 @@ class HttpService {
           return handler.next(response);
         },
         onError: (DioError e, handler) {
-          if (kDebugMode) {
-            print("🔴 API ERROR [${e.response?.statusCode}] => ${e.requestOptions.path}");
-            print("Message: ${e.message}");
-            print("Data: ${e.response?.data}");
-            print("----------------------------------------------------------");
+          try {
+            print("\n==================== API ERROR [${e.response?.statusCode}] ====================");
+            print("PATH: ${e.requestOptions.path}");
+            print("MESSAGE: ${e.message}");
+            print("RESPONSE BODY: ${e.response?.data}");
+            print("=================================================================\n");
+          } catch (err) {
+            print("Error printing API error: $err");
           }
           return handler.next(e);
         },
@@ -117,13 +162,16 @@ class HttpService {
     );
   }
 
+  static DioCacheManager? _cacheManager;
+
   DioCacheManager getCacheManager() {
-    return DioCacheManager(
+    _cacheManager ??= DioCacheManager(
       CacheConfig(
         baseUrl: host,
         defaultMaxAge: Duration(hours: 1),
       ),
     );
+    return _cacheManager!;
   }
 
   //for get api calls
@@ -308,89 +356,5 @@ class HttpService {
     }
 
     return response;
-  }
-}
-
-class CurlLoggerInterceptor extends Interceptor {
-  @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    try {
-      if (kDebugMode) {
-        print(" ");
-        print("┌──────────────────────────────────────────────────────────");
-        print("│ Curl command for: ${options.method.toUpperCase()} ${options.path}");
-        print("├──────────────────────────────────────────────────────────");
-        print(toCurl(options));
-        print("└──────────────────────────────────────────────────────────");
-        print(" ");
-      }
-    } catch (e) {
-      print("Error generating curl: $e");
-    }
-    super.onRequest(options, handler);
-  }
-
-  String toCurl(RequestOptions options) {
-    List<String> components = ['curl'];
-
-    // Method
-    components.add('-X ${options.method.toUpperCase()}');
-
-    // Headers
-    options.headers.forEach((k, v) {
-      if (k != 'cookie') {
-        components.add('-H "$k: $v"');
-      }
-    });
-
-    // Data / Body
-    if (options.data != null) {
-      var data = options.data;
-      if (data is FormData) {
-        for (var field in data.fields) {
-          components.add('-F "${field.key}=${field.value}"');
-        }
-        for (var file in data.files) {
-          components.add('-F "${file.key}=@${file.value.filename ?? 'file'}"');
-        }
-      } else if (data is Map || data is List) {
-        try {
-          final jsonString = json.encode(data);
-          components.add('-d \'$jsonString\'');
-        } catch (_) {
-          components.add('-d \'${data.toString()}\'');
-        }
-      } else {
-        components.add('-d \'${data.toString()}\'');
-      }
-    }
-
-    // URL
-    var url = options.path;
-    if (options.queryParameters.isNotEmpty) {
-      final queryStr = options.queryParameters.entries
-          .map((entry) => '${entry.key}=${Uri.encodeComponent(entry.value.toString())}')
-          .join('&');
-      if (url.contains('?')) {
-        url += '&$queryStr';
-      } else {
-        url += '?$queryStr';
-      }
-    }
-
-    if (!url.startsWith('http')) {
-      String baseUrl = options.baseUrl;
-      if (baseUrl.endsWith('/') && url.startsWith('/')) {
-        url = baseUrl + url.substring(1);
-      } else if (!baseUrl.endsWith('/') && !url.startsWith('/')) {
-        url = '$baseUrl/$url';
-      } else {
-        url = baseUrl + url;
-      }
-    }
-
-    components.add('"$url"');
-
-    return components.join(' \\\n  ');
   }
 }
