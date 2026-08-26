@@ -31,7 +31,7 @@ class _RequestLocationPermissionViewState
         VStack(
           [
             UiSpacer.vSpace(),
-            "In order to provide you with the best possible service, we need to access your location data. This will allow us to efficiently connect you with nearby riders, help you navigate to their pickup locations, and provide accurate arrival time estimates."
+            "Mahila Saarthi Driver requires location access to find nearby ride requests, calculate routes, and guide you to pickup and dropoff points."
                 .tr()
                 .text
                 .lg
@@ -40,7 +40,7 @@ class _RequestLocationPermissionViewState
                 .gray700
                 .makeCentered(),
             UiSpacer.vSpace(),
-            "To grant us permission to access your location, please tap \"Allow\" when prompted. If you prefer not to share your location, you can tap \"Deny\" and continue to use the app without this feature. However, this may impact your ability to receive trip requests and complete trips efficiently."
+            "Location access allows us to connect you with nearby riders efficiently. Tap \"Grant Permission\" to proceed or \"Not Now\" to skip for now."
                 .tr()
                 .text
                 .lg
@@ -48,6 +48,55 @@ class _RequestLocationPermissionViewState
                 .center
                 .gray700
                 .makeCentered(),
+            UiSpacer.vSpace(15),
+            VxBox(
+              child: HStack(
+                [
+                  Icon(
+                    widget.vm.currentLat != null
+                        ? Icons.my_location
+                        : Icons.location_off,
+                    color: widget.vm.currentLat != null
+                        ? Colors.green
+                        : Colors.orange,
+                    size: 28,
+                  ),
+                  UiSpacer.hSpace(12),
+                  VStack(
+                    [
+                      (widget.vm.currentLat != null
+                              ? "Current Location Detected"
+                              : "Location Not Detected Yet")
+                          .tr()
+                          .text
+                          .semiBold
+                          .lg
+                          .make(),
+                      if (widget.vm.isFetchingLocation)
+                        "Fetching location...".tr().text.sm.gray500.make()
+                      else if (widget.vm.currentLat != null)
+                        "Lat: ${widget.vm.currentLat!.toStringAsFixed(4)}, Long: ${widget.vm.currentLng!.toStringAsFixed(4)}"
+                            .text
+                            .sm
+                            .gray600
+                            .make()
+                      else
+                        "Tap Grant Permission to get location".tr().text.sm.gray500.make(),
+                    ],
+                  ).expand(),
+                ],
+              ).p16(),
+            )
+                .roundedSM
+                .color(widget.vm.currentLat != null
+                    ? Colors.green.shade50
+                    : Colors.orange.shade50)
+                .border(
+                    color: widget.vm.currentLat != null
+                        ? Colors.green.shade300
+                        : Colors.orange.shade300)
+                .make()
+                .wFull(context),
             UiSpacer.vSpace(),
           ],
         ).scrollVertical().expand(),
@@ -55,14 +104,14 @@ class _RequestLocationPermissionViewState
         UiSpacer.vSpace(),
         CustomButton(
           shapeRadius: 25,
-          title: "Next".tr(),
+          title: "Grant Permission".tr(),
           onPressed: widget.vm.handleLocationPermission,
         ),
         UiSpacer.vSpace(10),
         Visibility(
           visible: !Platform.isIOS,
           child: CustomTextButton(
-            title: "Skip".tr(),
+            title: "Not Now".tr(),
             onPressed: widget.vm.nextStep,
           ).wFull(context),
         ),

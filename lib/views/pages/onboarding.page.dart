@@ -20,33 +20,35 @@ class _OnboardingPageState extends State<OnboardingPage> {
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      body: ViewModelBuilder<OnboardingViewModel>.reactive(
-        viewModelBuilder: () => OnboardingViewModel(context, finishLoading),
-        onViewModelReady: (vm) => vm.initialise(),
-        builder: (context, vm, child) {
-          return VStack(
-            [
-              if (vm.isBusy)
-                BusyIndicator().centered().expand()
-              else
-                Directionality(
-                  textDirection: Utils.textDirection,
-                  child: OverBoard(
-                    pages: vm.onBoardData,
-                    showBullets: true,
-                    skipText: "Skip".tr(),
-                    nextText: "Next".tr(),
-                    finishText: "Done".tr(),
-                    skipCallback: vm.onDonePressed,
-                    finishCallback: vm.onDonePressed,
-                    buttonColor: AppColor.primaryColor,
-                    inactiveBulletColor: AppColor.accentColor,
-                    activeBulletColor: AppColor.primaryColorDark,
-                  ),
-                ).expand(),
-            ],
-          );
-        },
+      body: SafeArea(
+        child: ViewModelBuilder<OnboardingViewModel>.reactive(
+          viewModelBuilder: () => OnboardingViewModel(context, finishLoading),
+          onViewModelReady: (vm) => vm.initialise(),
+          builder: (context, vm, child) {
+            return VStack(
+              [
+                if (vm.isBusy)
+                  BusyIndicator().centered().expand()
+                else
+                  Directionality(
+                    textDirection: Utils.textDirection,
+                    child: OverBoard(
+                      pages: vm.onBoardData,
+                      showBullets: true,
+                      skipText: "Skip".tr(),
+                      nextText: "Next".tr(),
+                      finishText: "Done".tr(),
+                      skipCallback: vm.onDonePressed,
+                      finishCallback: vm.onDonePressed,
+                      buttonColor: AppColor.primaryColor,
+                      inactiveBulletColor: AppColor.accentColor,
+                      activeBulletColor: AppColor.primaryColorDark,
+                    ),
+                  ).expand(),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

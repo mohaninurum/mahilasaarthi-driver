@@ -8,6 +8,7 @@ import 'package:mahilasaarthi/widgets/base.page.dart';
 import 'package:mahilasaarthi/widgets/busy_indicator.dart';
 import 'package:mahilasaarthi/widgets/cards/custom.visibility.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mahilasaarthi/services/location.service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -62,7 +63,13 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
                 visible: vm.taxiGoogleMapManagerService.canShowMap,
                 child: GoogleMap(
                   initialCameraPosition: CameraPosition(
-                    target: LatLng(0.00, 0.00),
+                    target: LocationService().currentLocation?.latitude != null
+                        ? LatLng(
+                            LocationService().currentLocation!.latitude!,
+                            LocationService().currentLocation!.longitude!,
+                          )
+                        : LatLng(20.5937, 78.9629),
+                    zoom: 16,
                   ),
                   myLocationButtonEnabled: true,
                   onMapCreated: vm.taxiGoogleMapManagerService.onMapReady,

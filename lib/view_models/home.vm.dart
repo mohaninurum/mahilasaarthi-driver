@@ -127,8 +127,13 @@ class HomeViewModel extends MyBaseViewModel with UpdateService {
 
       if (!inUseStatus.isGranted || !alwaysUseStatus.isGranted || !overlayGranted) {
         // Redirect to permission page to show prominent disclosure and request permissions
-        viewContext.nextPage(PermissionPage());
-        return;
+        final result = await Navigator.push(
+          viewContext,
+          MaterialPageRoute(builder: (context) => const PermissionPage()),
+        );
+        if (result != true) {
+          return;
+        }
       }
     }
 

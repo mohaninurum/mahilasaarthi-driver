@@ -37,7 +37,7 @@ class _RequestBGLocationPermissionViewState
         VStack(
           [
             UiSpacer.vSpace(),
-            "Mahila Saarthi Driver collects location data to enable ride assignments and track ongoing trips even when the app is closed or not in use."
+            "Mahila Saarthi Driver collects location data to enable ride assignments, route navigation, and customer trip tracking even when the app is closed or not in use when you are Online."
                 .tr()
                 .text
                 .lg
@@ -46,7 +46,7 @@ class _RequestBGLocationPermissionViewState
                 .gray700
                 .makeCentered(),
             UiSpacer.vSpace(),
-            "Rest assured that we take your privacy seriously and will only use your location data in accordance with our privacy policy. We will never sell or share your data with third parties."
+            "Your location data is strictly protected and used only to process trips in accordance with our Privacy Policy. We never sell or share your data."
                 .tr()
                 .text
                 .lg
@@ -59,7 +59,7 @@ class _RequestBGLocationPermissionViewState
         ).scrollVertical().expand(),
         CustomButton(
           shapeRadius: 25,
-          title: "Next".tr(),
+          title: "Grant Permission".tr(),
           onPressed: widget.vm.handleBackgroundLocationPermission,
         ),
         UiSpacer.vSpace(10),

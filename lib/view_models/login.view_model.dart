@@ -334,8 +334,26 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
           await AuthServices.saveVehicle(apiResponse.body["vehicle"]);
           await AuthServices.syncDriverData(apiResponse.body);
         }
-        await AuthServices.setAuthBearerToken(apiResponse.body["token"]);
-        await AuthServices.isAuthenticated();
+
+        // Robust token extraction
+        String token = "";
+        if (apiResponse.body is Map) {
+          if (apiResponse.body["token"] != null && apiResponse.body["token"] is String) {
+            token = apiResponse.body["token"].toString();
+          } else if (apiResponse.body["access_token"] != null) {
+            token = apiResponse.body["access_token"].toString();
+          } else if (apiResponse.body["token"] is Map && apiResponse.body["token"]["token"] != null) {
+            token = apiResponse.body["token"]["token"].toString();
+          } else if (apiResponse.body["user"] is Map && apiResponse.body["user"]["token"] != null) {
+            token = apiResponse.body["user"]["token"].toString();
+          }
+        }
+        if (token.isNotEmpty) {
+          await AuthServices.setAuthBearerToken(token);
+          await AuthServices.isAuthenticated();
+        } else {
+          print("WARNING: Login response did not contain a valid token! Body: ${apiResponse.body}");
+        }
 
         Navigator.of(viewContext).pushNamedAndRemoveUntil(
           AppRoutes.homeRoute,

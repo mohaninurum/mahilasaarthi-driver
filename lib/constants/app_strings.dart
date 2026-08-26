@@ -32,8 +32,11 @@ class AppStrings {
   static bool get verifyOrderByPhoto => env('orderVerificationType') == "photo";
   static bool get enableDriverWallet => ["1", 1, "true", true].contains(env('enableDriverWallet'));
   static bool get enableChat => ["1", 1, "true", true].contains(env('enableChat'));
-  static bool get partnersCanRegister =>
-      ["1", 1, "true", true].contains(env('partnersCanRegister'));
+  static bool get partnersCanRegister {
+    final val = env('partnersCanRegister');
+    if (val == null || val == "" || val.toString().isEmpty) return true;
+    return ["1", 1, "true", true].contains(val);
+  }
   static double get driverSearchRadius =>
       double.tryParse((env('driverSearchRadius') ?? 10).toString()) ?? 10.0;
   static int get maxDriverOrderAtOnce =>

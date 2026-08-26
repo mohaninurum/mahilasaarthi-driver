@@ -24,7 +24,7 @@ class _RequestBGPermissionViewState extends State<RequestBGPermissionView> {
     return VStack(
       [
         UiSpacer.vSpace(),
-        "Background Permission Request"
+        "Background Service Permission"
             .tr()
             .text
             .xl3
@@ -36,7 +36,7 @@ class _RequestBGPermissionViewState extends State<RequestBGPermissionView> {
         VStack(
           [
             UiSpacer.vSpace(),
-            "We need to run our app in the background even when you're not using it. This will allow us to offer personalized notifications, updates, and other features that require real-time data."
+            "Mahila Saarthi Driver requires background execution to keep your online driver status active and ensure instant receipt of new ride notifications."
                 .tr()
                 .text
                 .lg
@@ -49,14 +49,14 @@ class _RequestBGPermissionViewState extends State<RequestBGPermissionView> {
         ).scrollVertical().expand(),
         CustomButton(
           shapeRadius: 25,
-          title: "Next".tr(),
+          title: "Grant Permission".tr(),
           onPressed: widget.vm.handleBackgroundPermission,
         ),
         UiSpacer.vSpace(10),
         Visibility(
           visible: !Platform.isIOS,
           child: CustomTextButton(
-            title: "Skip".tr(),
+            title: "Not Now".tr(),
             onPressed: widget.vm.nextStep,
           ).wFull(context),
         ),

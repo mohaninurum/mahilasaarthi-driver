@@ -26,7 +26,7 @@ class RegularLocationPermissionDialog extends StatelessWidget {
           CustomButton(
             title: "Next".tr(),
             onPressed: () {
-              Navigator.pop(AppService().navigatorKey.currentContext!, true);
+              Navigator.pop(context, true);
             },
           ).py12(),
           Visibility(

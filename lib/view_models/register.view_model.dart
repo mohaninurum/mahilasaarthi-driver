@@ -144,6 +144,11 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
   }
 
   void processRegister() async {
+    if (formBuilderKey.currentState == null) {
+      toastError("Please fill out the registration form".tr());
+      return;
+    }
+
     // Validate returns true if the form is valid, otherwise false.
     if (formBuilderKey.currentState!.saveAndValidate()) {
       if (selectedCarMake == null) {
@@ -157,7 +162,12 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
       setBusy(true);
       try {
         Map<String, dynamic> mValues = formBuilderKey.currentState!.value;
-        String phone = mValues['phone'].toString();
+        String phone = mValues['phone']?.toString() ?? "";
+        if (phone.isEmpty) {
+          toastError("Please enter a valid phone number".tr());
+          setBusy(false);
+          return;
+        }
         accountPhoneNumber =
             Utils.getFormattedPhoneNumber(phone, selectedCountry.phoneCode);
 
@@ -183,6 +193,8 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         toastError("$error");
         setBusy(false);
       }
+    } else {
+      toastError("Please fill all required fields correctly".tr());
     }
   }
 
@@ -324,158 +336,236 @@ class RegisterViewModel extends MyBaseViewModel with QrcodeScannerTrait {
   Future<void> startAadhaarVerification() async {
     setBusy(false);
     TextEditingController aadhaarTEC = TextEditingController();
+    bool isGeneratingOtp = false;
+
     showDialog(
       context: viewContext,
       barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Aadhaar Verification".tr()),
-          content: TextField(
-            controller: aadhaarTEC,
-            keyboardType: TextInputType.number,
-            maxLength: 12,
-            decoration: InputDecoration(
-              hintText: "Enter 12-digit Aadhaar Number".tr(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Cancel".tr()),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (aadhaarTEC.text.length == 12) {
-                  bool success = await submitAadhaarNumber(aadhaarTEC.text);
-                  if (success) {
-                    Navigator.pop(context);
-                  }
-                } else {
-                  toastError("Enter valid 12 digit Aadhaar".tr());
-                }
-              },
-              child: Text("Generate OTP".tr()),
-            ),
-          ],
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text("Aadhaar Verification".tr()),
+              content: TextField(
+                controller: aadhaarTEC,
+                enabled: !isGeneratingOtp,
+                keyboardType: TextInputType.number,
+                maxLength: 12,
+                decoration: InputDecoration(
+                  hintText: "Enter 12-digit Aadhaar Number".tr(),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isGeneratingOtp
+                      ? null
+                      : () => Navigator.pop(dialogContext),
+                  child: Text("Cancel".tr()),
+                ),
+                ElevatedButton(
+                  onPressed: isGeneratingOtp
+                      ? null
+                      : () async {
+                          if (aadhaarTEC.text.trim().length == 12) {
+                            setState(() {
+                              isGeneratingOtp = true;
+                            });
+                            bool success = await submitAadhaarNumber(
+                                aadhaarTEC.text.trim());
+                            if (success) {
+                              Navigator.pop(dialogContext);
+                              showAadhaarOtpEntry();
+                            } else {
+                              setState(() {
+                                isGeneratingOtp = false;
+                              });
+                            }
+                          } else {
+                            toastError("Enter valid 12 digit Aadhaar".tr());
+                          }
+                        },
+                  child: isGeneratingOtp
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text("Generate OTP".tr()),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
 
   Future<bool> submitAadhaarNumber(String aadhaar) async {
-    setBusy(true);
     try {
       final response = await _authRequest.generateAadhaarOtp(aadhaar);
-      if (response.allGood || response.body['status'] == 'SUCCESS') {
+      if (response.allGood ||
+          (response.body is Map && response.body['status'] == 'SUCCESS')) {
         aadhaarNumber = aadhaar;
-        aadhaarRefId = response.body['ref_id'];
-        setBusy(false);
-        showAadhaarOtpEntry();
+        aadhaarRefId = response.body is Map
+            ? (response.body['ref_id']?.toString() ??
+                response.body['data']?['ref_id']?.toString())
+            : null;
         return true;
       } else {
-        toastError(response.body['message'] ?? "Aadhaar API Error");
-        setBusy(false);
+        String msg = response.message ?? "";
+        if (msg.isEmpty &&
+            response.body is Map &&
+            response.body['message'] != null) {
+          msg = response.body['message'].toString();
+        }
+        if (msg.isEmpty) {
+          msg = "Aadhaar API Error".tr();
+        }
+        toastError(msg);
         return false;
       }
     } catch (e) {
       toastError(e.toString());
-      setBusy(false);
       return false;
     }
   }
 
   void showAadhaarOtpEntry([String? otpCode]) {
     TextEditingController otpTEC = TextEditingController(text: otpCode);
+    bool isVerifyingOtp = false;
+
     showDialog(
       context: viewContext,
       barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Aadhaar OTP".tr()),
-          content: TextField(
-            controller: otpTEC,
-            keyboardType: TextInputType.number,
-            maxLength: 6,
-            decoration: InputDecoration(
-              hintText: "Enter 6-digit Aadhaar OTP".tr(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Cancel".tr()),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (otpTEC.text.length == 6) {
-                  bool success = await submitAadhaarOtp(otpTEC.text);
-                  if (success) {
-                    Navigator.pop(context);
-                  }
-                } else {
-                  toastError("Enter valid OTP".tr());
-                }
-              },
-              child: Text("Verify OTP".tr()),
-            ),
-          ],
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text("Aadhaar OTP".tr()),
+              content: TextField(
+                controller: otpTEC,
+                enabled: !isVerifyingOtp,
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                decoration: InputDecoration(
+                  hintText: "Enter 6-digit Aadhaar OTP".tr(),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isVerifyingOtp
+                      ? null
+                      : () => Navigator.pop(dialogContext),
+                  child: Text("Cancel".tr()),
+                ),
+                ElevatedButton(
+                  onPressed: isVerifyingOtp
+                      ? null
+                      : () async {
+                          if (otpTEC.text.trim().length == 6) {
+                            setState(() {
+                              isVerifyingOtp = true;
+                            });
+                            bool success =
+                                await submitAadhaarOtp(otpTEC.text.trim());
+                            if (success) {
+                              Navigator.pop(dialogContext);
+                              onAadhaarVerifiedSuccess();
+                            } else {
+                              setState(() {
+                                isVerifyingOtp = false;
+                              });
+                            }
+                          } else {
+                            toastError("Enter valid OTP".tr());
+                          }
+                        },
+                  child: isVerifyingOtp
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text("Verify OTP".tr()),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
 
   Future<bool> submitAadhaarOtp(String otp) async {
-    if (aadhaarRefId == null) return false;
-    setBusy(true);
+    if (aadhaarRefId == null) {
+      toastError("Invalid Reference ID".tr());
+      return false;
+    }
     try {
       final response = await _authRequest.verifyAadhaarOtp(aadhaarRefId!, otp);
       if (response.allGood ||
-          response.body['status'] == 'SUCCESS' ||
-          response.body['status'] == 'VALID') {
-        aadhaarDetails = response.body;
-
-        // Check gender
-        String? gender;
-        if (response.body != null) {
-          gender = response.body['gender']?.toString().toUpperCase();
-        }
-
-        if (gender == 'M' || gender == 'MALE') {
-          setBusy(false);
-          showDialog(
-            context: viewContext,
-            barrierDismissible: false,
-            builder: (context) {
-              return AlertDialog(
-                title: Text("Registration Failed".tr()),
-                content: Text("Only female can register on Mahila Saarthi.".tr()),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text("OK".tr()),
-                  ),
-                ],
-              );
-            },
-          );
-          return true;
-        }
-
-        toastSuccessful("Aadhaar Verified Successfully!".tr());
-        setBusy(false);
-        // Step 3: Face Liveness
-        startFaceLivenessCheck();
+          (response.body is Map &&
+              (response.body['status'] == 'SUCCESS' ||
+                  response.body['status'] == 'VALID'))) {
+        aadhaarDetails = response.body is Map ? response.body : {};
         return true;
       } else {
-        toastError(response.body['message'] ?? "Invalid Aadhaar OTP");
-        setBusy(false);
+        String msg = response.message ?? "";
+        if (msg.isEmpty &&
+            response.body is Map &&
+            response.body['message'] != null) {
+          msg = response.body['message'].toString();
+        }
+        if (msg.isEmpty) {
+          msg = "Invalid Aadhaar OTP".tr();
+        }
+        toastError(msg);
         return false;
       }
     } catch (e) {
       toastError(e.toString());
-      setBusy(false);
       return false;
     }
+  }
+
+  void onAadhaarVerifiedSuccess() {
+    // Check gender
+    String? gender;
+    if (aadhaarDetails != null) {
+      gender = aadhaarDetails!['gender']?.toString().toUpperCase();
+    }
+
+    if (gender == 'M' || gender == 'MALE') {
+      showDialog(
+        context: viewContext,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Registration Failed".tr()),
+            content: Text("Only female can register on Mahila Saarthi.".tr()),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("OK".tr()),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    toastSuccessful("Aadhaar Verified Successfully!".tr());
+    // Step 3: Face Liveness
+    startFaceLivenessCheck();
   }
 
   Future<void> startFaceLivenessCheck() async {

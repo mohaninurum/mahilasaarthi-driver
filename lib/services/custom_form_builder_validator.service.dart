@@ -34,7 +34,9 @@ class CustomFormBuilderValidator {
 
   static String? compose(List<String?> validators) {
     for (var validatorResult in validators) {
-      return validatorResult;
+      if (validatorResult != null) {
+        return validatorResult;
+      }
     }
     return null;
   }

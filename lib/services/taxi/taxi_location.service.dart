@@ -33,11 +33,48 @@ class TaxiLocationService {
 
   //
   startLocationListener() async {
-    if (await AppPermissionHandlerService().isLocationGranted()) {
-      taxiViewModel?.taxiGoogleMapManagerService.canShowMap = true;
+    bool isGranted = await AppPermissionHandlerService().isLocationGranted();
+    if (!isGranted) {
+      taxiViewModel?.taxiGoogleMapManagerService.canShowMap = false;
       taxiViewModel?.notifyListeners();
-      startListeningToDriverLocation();
+      requestLocationPermissionForGoogleMap();
+      return;
     }
+
+    taxiViewModel?.taxiGoogleMapManagerService.canShowMap = true;
+    taxiViewModel?.notifyListeners();
+
+    // Prepare location service and sync initial position
+    await LocationService().prepareLocationListener();
+    if (LocationService().currentLocation?.latitude != null &&
+        LocationService().currentLocation?.longitude != null) {
+      final lat = LocationService().currentLocation!.latitude!;
+      final lng = LocationService().currentLocation!.longitude!;
+      updateDriverMarker(LatLng(lat, lng), 0.0);
+      zoomToLocation();
+    }
+
+    startListeningToDriverLocation();
+  }
+
+  void updateDriverMarker(LatLng pos, double heading) {
+    if (taxiViewModel == null) return;
+    driverMarker = Marker(
+      markerId: taxiViewModel!.taxiGoogleMapManagerService.driverMarkerId,
+      position: pos,
+      rotation: heading,
+      icon: taxiViewModel?.taxiGoogleMapManagerService.driverIcon ??
+          BitmapDescriptor.defaultMarker,
+      anchor: Offset(0.5, 0.5),
+    );
+
+    taxiViewModel!.taxiGoogleMapManagerService.gMapMarkers.removeWhere(
+      (marker) =>
+          marker.markerId ==
+          taxiViewModel!.taxiGoogleMapManagerService.driverMarkerId,
+    );
+    taxiViewModel!.taxiGoogleMapManagerService.gMapMarkers.add(driverMarker!);
+    taxiViewModel?.notifyListeners();
   }
 
   //
@@ -47,49 +84,7 @@ class TaxiLocationService {
     //
     myLocationListener = LocationService().getNewLocationStream().listen(
       (event) {
-        //
-        if (driverMarker == null) {
-          //new driver maker
-          driverMarker = Marker(
-            markerId: taxiViewModel!.taxiGoogleMapManagerService.driverMarkerId,
-            position: LatLng(
-              event.latitude,
-              event.longitude,
-            ),
-            rotation: event.heading,
-            icon: taxiViewModel?.taxiGoogleMapManagerService.driverIcon ??
-                BitmapDescriptor.defaultMarker,
-            anchor: Offset(0.5, 0.5),
-          );
-
-//
-          taxiViewModel!.taxiGoogleMapManagerService.gMapMarkers =
-              taxiViewModel!.taxiGoogleMapManagerService.gMapMarkers
-                  .replaceFirstWhere(
-                    (marker) =>
-                        marker.markerId ==
-                        taxiViewModel!
-                            .taxiGoogleMapManagerService.driverMarkerId,
-                    driverMarker!,
-                  )
-                  .toSet();
-        } else {
-          //update driver maker
-          driverMarker = driverMarker?.copyWith(
-            positionParam: LatLng(
-              event.latitude,
-              event.longitude,
-            ),
-            rotationParam: event.heading,
-          );
-
-          //
-          taxiViewModel!.taxiGoogleMapManagerService.gMapMarkers
-              .add(driverMarker!);
-        }
-
-        //
-        taxiViewModel?.notifyListeners();
+        updateDriverMarker(LatLng(event.latitude, event.longitude), event.heading);
         zoomToLocation();
       },
     );
@@ -98,15 +93,24 @@ class TaxiLocationService {
   zoomToLocation() async {
     //
     try {
-      taxiViewModel!.taxiGoogleMapManagerService.googleMapController
-          ?.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: driverMarker?.position ?? LatLng(0.00, 0.00),
-            zoom: 16,
+      LatLng? targetPos = driverMarker?.position;
+      if (targetPos == null && LocationService().currentLocation?.latitude != null) {
+        targetPos = LatLng(
+          LocationService().currentLocation!.latitude!,
+          LocationService().currentLocation!.longitude!,
+        );
+      }
+      if (targetPos != null) {
+        taxiViewModel!.taxiGoogleMapManagerService.googleMapController
+            ?.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: targetPos,
+              zoom: 16,
+            ),
           ),
-        ),
-      );
+        );
+      }
     } catch (error) {
       print("Error animating camera: $error");
     }
@@ -126,9 +130,17 @@ class TaxiLocationService {
     });
   }
 
+  bool isRequestingPermission = false;
+
   void requestLocationPermissionForGoogleMap() async {
-    await AppPermissionHandlerService().handleLocationRequest();
-    taxiViewModel!.taxiLocationService.startLocationListener();
+    if (isRequestingPermission) return;
+    isRequestingPermission = true;
+    try {
+      await AppPermissionHandlerService().handleForegroundLocationOnlyRequest();
+      startLocationListener();
+    } finally {
+      isRequestingPermission = false;
+    }
   }
 
   //ETA section

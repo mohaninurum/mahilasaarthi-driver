@@ -31,6 +31,10 @@ class TaxiGoogleMapManagerService {
   onMapReady(GoogleMapController controller) {
     googleMapController = controller;
     setGoogleMapStyle();
+    
+    if (taxiViewModel?.taxiLocationService.driverMarker != null) {
+      taxiViewModel?.taxiLocationService.zoomToLocation();
+    }
   }
 
   onMapCameraMoveStarted() {
@@ -45,12 +49,17 @@ class TaxiGoogleMapManagerService {
     if (taxiViewModel == null) {
       return;
     }
-    String value =
-        await DefaultAssetBundle.of(taxiViewModel!.viewContext).loadString(
-      'assets/json/google_map_style.json',
-    );
-    //
-    googleMapController?.setMapStyle(value);
+    try {
+      String value =
+          await DefaultAssetBundle.of(taxiViewModel!.viewContext).loadString(
+        'assets/json/google_map_style.json',
+      );
+      if (googleMapController != null) {
+        await googleMapController?.setMapStyle(value);
+      }
+    } catch (e) {
+      print("Error setting map style: $e");
+    }
   }
 
   setSourceAndDestinationIcons() async {

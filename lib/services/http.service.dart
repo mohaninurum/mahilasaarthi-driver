@@ -29,11 +29,14 @@ class HttpService {
     } catch (_) {
       langCode = "en";
     }
-    return {
+    final headers = <String, String>{
       HttpHeaders.acceptHeader: "application/json",
-      HttpHeaders.authorizationHeader: "Bearer $userToken",
       "lang": langCode,
     };
+    if (userToken.isNotEmpty) {
+      headers[HttpHeaders.authorizationHeader] = "Bearer $userToken";
+    }
+    return headers;
   }
 
   HttpService() {
@@ -42,10 +45,10 @@ class HttpService {
     baseOptions = new BaseOptions(
       baseUrl: host,
       validateStatus: (status) {
-        return status != null && status <= 500;
+        return status != null && status <= 599;
       },
-      connectTimeout: 10000,
-      receiveTimeout: 10000,
+      connectTimeout: 60000,
+      receiveTimeout: 60000,
     );
     dio = new Dio(baseOptions);
     (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
@@ -57,9 +60,16 @@ class HttpService {
     dio.interceptors.add(getCacheManager().interceptor);
     dio.interceptors.add(CurlLoggerInterceptor());
     
-    // Add interceptor for handling API responses and 401 Unauthorized globally
+    // Add interceptor for handling API requests/responses and 401 Unauthorized globally
     dio.interceptors.add(
       InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final userToken = await AuthServices.getAuthBearerToken();
+          if (userToken.isNotEmpty) {
+            options.headers[HttpHeaders.authorizationHeader] = "Bearer $userToken";
+          }
+          return handler.next(options);
+        },
         onResponse: (response, handler) async {
           if (kDebugMode) {
             print("🟢 API RESPONSE [${response.statusCode}] => ${response.requestOptions.path}");
@@ -70,14 +80,23 @@ class HttpService {
           if (response.statusCode == 401) {
             try {
               final path = response.requestOptions.path;
-              bool isAuthEndpoint = path.contains('/login') || path.contains('/otp/') || path.contains('/register');
+              bool isAuthEndpoint = path.contains('/login') ||
+                  path.contains('/otp/') ||
+                  path.contains('/register') ||
+                  path.contains('/verify');
               
               if (!isAuthEndpoint) {
-                await AuthServices.logout();
-                AppService().navigatorKey.currentState?.pushNamedAndRemoveUntil(
-                      AppRoutes.welcomeRoute,
-                      (route) => false,
-                    );
+                final token = await AuthServices.getAuthBearerToken();
+                if (token.isNotEmpty) {
+                  print("401 Unauthorized for path $path with active token. Logging out user...");
+                  await AuthServices.logout();
+                  AppService().navigatorKey.currentState?.pushNamedAndRemoveUntil(
+                        AppRoutes.welcomeRoute,
+                        (route) => false,
+                      );
+                } else {
+                  print("401 Unauthorized for path $path but token is empty. Skipping auto-logout redirect.");
+                }
               }
             } catch (error) {
               print("Logout error on 401: $error");
@@ -123,11 +142,17 @@ class HttpService {
             headers: await getHeaders(),
           );
 
-    return dio.get(
-      uri,
-      options: mOptions,
-      queryParameters: queryParameters,
-    );
+    Response response;
+    try {
+      response = await dio.get(
+        uri,
+        options: mOptions,
+        queryParameters: queryParameters,
+      );
+    } on DioError catch (error) {
+      response = formatDioExecption(error);
+    }
+    return response;
   }
 
   //for post api calls
@@ -146,11 +171,17 @@ class HttpService {
             headers: await getHeaders(),
           );
 
-    return dio.post(
-      uri,
-      data: body,
-      options: mOptions,
-    );
+    Response response;
+    try {
+      response = await dio.post(
+        uri,
+        data: body,
+        options: mOptions,
+      );
+    } on DioError catch (error) {
+      response = formatDioExecption(error);
+    }
+    return response;
   }
 
   //for post api calls with file upload
@@ -216,13 +247,19 @@ class HttpService {
   //for patch api calls
   Future<Response> patch(String url, Map<String, dynamic> body) async {
     String uri = "$host$url";
-    return dio.patch(
-      uri,
-      data: body,
-      options: Options(
-        headers: await getHeaders(),
-      ),
-    );
+    Response response;
+    try {
+      response = await dio.patch(
+        uri,
+        data: body,
+        options: Options(
+          headers: await getHeaders(),
+        ),
+      );
+    } on DioError catch (error) {
+      response = formatDioExecption(error);
+    }
+    return response;
   }
 
   //for delete api calls
@@ -230,19 +267,30 @@ class HttpService {
     String url,
   ) async {
     String uri = "$host$url";
-    return dio.delete(
-      uri,
-      options: Options(
-        headers: await getHeaders(),
-      ),
-    );
+    Response response;
+    try {
+      response = await dio.delete(
+        uri,
+        options: Options(
+          headers: await getHeaders(),
+        ),
+      );
+    } on DioError catch (error) {
+      response = formatDioExecption(error);
+    }
+    return response;
   }
 
   Response formatDioExecption(DioError ex) {
+    if (ex.response != null) {
+      return ex.response!;
+    }
     var response = Response(requestOptions: ex.requestOptions);
     response.statusCode = 400;
     try {
-      if (ex.type == DioErrorType.connectTimeout) {
+      if (ex.type == DioErrorType.connectTimeout ||
+          ex.type == DioErrorType.receiveTimeout ||
+          ex.type == DioErrorType.sendTimeout) {
         response.data = {
           "message":
               "Connection timeout. Please check your internet connection and try again",
@@ -255,9 +303,7 @@ class HttpService {
     } catch (error) {
       response.statusCode = 400;
       response.data = {
-        "message": (error is Map && error.containsKey("message"))
-            ? "${error["message"]}"
-            : "Please check your internet connection and try again",
+        "message": "Please check your internet connection and try again",
       };
     }
 

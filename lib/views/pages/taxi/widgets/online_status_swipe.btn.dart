@@ -62,11 +62,20 @@ class _OnlineStatusSwipeButtonState extends State<OnlineStatusSwipeButton> {
           final overlayGranted = Platform.isIOS ? true : systemAlertWindowStatus.isGranted;
 
           if (!inUseStatus.isGranted || !alwaysUseStatus.isGranted || !overlayGranted) {
-            context.nextPage(PermissionPage());
-            return;
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const PermissionPage()),
+            );
+            if (result != true) {
+              return;
+            }
           }
         }
         await widget.vm.newTaxiBookingService.toggleVisibility(newDriverState, showLoading: true);
+        if (newDriverState) {
+          widget.vm.taxiLocationService.startLocationListener();
+          widget.vm.taxiLocationService.zoomToLocation();
+        }
         setState(() {});
       } catch (error) {
         widget.vm.toastError("$error");

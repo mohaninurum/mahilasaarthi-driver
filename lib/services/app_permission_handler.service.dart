@@ -38,6 +38,34 @@ class AppPermissionHandlerService {
     return status.isGranted;
   }
 
+  Future<bool> handleForegroundLocationOnlyRequest() async {
+    try {
+      var status = await Permission.locationWhenInUse.status;
+      if (!status.isGranted) {
+        final requestResult = await showDialog(
+          barrierDismissible: false,
+          context: AppService().navigatorKey.currentContext!,
+          builder: (context) {
+            return RegularLocationPermissionDialog();
+          },
+        );
+        if (requestResult == null || (requestResult is bool && !requestResult)) {
+          return false;
+        }
+
+        PermissionStatus newStatus = await Permission.locationWhenInUse.request();
+        if (!newStatus.isGranted) {
+          permissionDeniedAlert();
+          return false;
+        }
+      }
+      return true;
+    } catch (e) {
+      print("Error in handleForegroundLocationOnlyRequest: $e");
+      return false;
+    }
+  }
+
   Future<bool> handleLocationRequest() async {
     var status = await Permission.locationWhenInUse.status;
     //check if location permission is not granted

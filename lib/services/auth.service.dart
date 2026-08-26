@@ -17,27 +17,35 @@ class AuthServices {
   }
 
   static firstTimeCompleted() async {
-    await LocalStorageService.prefs?.setBool(AppStrings.firstTimeOnApp, false);
+    final prefs = await LocalStorageService.getPrefs();
+    await prefs?.setBool(AppStrings.firstTimeOnApp, false);
   }
 
   //
   static bool authenticated() {
-    return LocalStorageService.prefs?.getBool(AppStrings.authenticated) ??
-        false;
+    final isAuth = LocalStorageService.prefs?.getBool(AppStrings.authenticated) ?? false;
+    final token = LocalStorageService.prefs?.getString(AppStrings.userAuthToken) ?? "";
+    return isAuth && token.isNotEmpty;
   }
 
   static Future<bool> isAuthenticated() async {
-    return await LocalStorageService.prefs?.setBool(AppStrings.authenticated, true) ?? false;
+    final prefs = await LocalStorageService.getPrefs();
+    return await prefs?.setBool(AppStrings.authenticated, true) ?? false;
   }
 
   // Token
   static Future<String> getAuthBearerToken() async {
-    return LocalStorageService.prefs?.getString(AppStrings.userAuthToken) ?? "";
+    final prefs = await LocalStorageService.getPrefs();
+    final token = prefs?.getString(AppStrings.userAuthToken) ?? "";
+    return token;
   }
 
-  static Future<bool> setAuthBearerToken(token) async {
-    return await LocalStorageService.prefs
-        ?.setString(AppStrings.userAuthToken, token) ?? false;
+  static Future<bool> setAuthBearerToken(dynamic token) async {
+    if (token == null) return false;
+    final tokenStr = token.toString().trim();
+    if (tokenStr.isEmpty) return false;
+    final prefs = await LocalStorageService.getPrefs();
+    return await prefs?.setString(AppStrings.userAuthToken, tokenStr) ?? false;
   }
 
   //Locale
@@ -46,7 +54,8 @@ class AuthServices {
   }
 
   static Future<bool> setLocale(language) async {
-    return await LocalStorageService.prefs?.setString(AppStrings.appLocale, language) ?? false;
+    final prefs = await LocalStorageService.getPrefs();
+    return await prefs?.setString(AppStrings.appLocale, language) ?? false;
   }
 
   //
@@ -54,8 +63,8 @@ class AuthServices {
   static User? currentUser;
   static Future<User> getCurrentUser({bool force = false}) async {
     if (currentUser == null || force) {
-      final userStringObject =
-          LocalStorageService.prefs?.getString(AppStrings.userKey);
+      final prefs = await LocalStorageService.getPrefs();
+      final userStringObject = prefs?.getString(AppStrings.userKey);
       final userObject = json.decode(userStringObject ?? "{}");
       currentUser = User.fromJson(userObject);
     }
@@ -75,7 +84,8 @@ class AuthServices {
       }
     }
     try {
-      await LocalStorageService.prefs?.setString(
+      final prefs = await LocalStorageService.getPrefs();
+      await prefs?.setString(
         AppStrings.userKey,
         json.encode(
           currentUser!.toJson(),
@@ -103,8 +113,8 @@ class AuthServices {
   static Vehicle? driverVehicle;
   static Future<Vehicle?> getDriverVehicle({bool force = false}) async {
     if (driverVehicle == null || force) {
-      final vehicleStringObject = LocalStorageService.prefs
-          ?.getString(AppStrings.driverVehicleKey);
+      final prefs = await LocalStorageService.getPrefs();
+      final vehicleStringObject = prefs?.getString(AppStrings.driverVehicleKey);
       //
       if (vehicleStringObject == null || vehicleStringObject.isEmpty) {
         driverVehicle = null;
@@ -122,14 +132,13 @@ class AuthServices {
   static Future<Vehicle> saveVehicle(dynamic jsonObject) async {
     driverVehicle = Vehicle.fromJson(jsonObject);
     try {
-      //
-      await LocalStorageService.prefs?.setString(
+      final prefs = await LocalStorageService.getPrefs();
+      await prefs?.setString(
         AppStrings.driverVehicleKey,
         json.encode(
           driverVehicle!.toJson(),
         ),
       );
-      //sync vehicle data with free,is_online status with firebase
 
       return driverVehicle!;
     } catch (error) {
@@ -141,25 +150,30 @@ class AuthServices {
   ///
   ///
   //
-  static logout() async {
+  static Future<void> logout() async {
     try {
       await HttpService().getCacheManager().clearAll();
     } catch (_) {}
     try {
-      await LocalStorageService.prefs?.clear();
-      await LocalStorageService.prefs?.setBool(AppStrings.firstTimeOnApp, false);
+      final prefs = await LocalStorageService.getPrefs();
+      await prefs?.clear();
+      await prefs?.setBool(AppStrings.firstTimeOnApp, false);
     } catch (_) {}
     try {
-      FirebaseService()
-          .firebaseMessaging
-          .unsubscribeFromTopic("${currentUser?.id}");
-      FirebaseService()
-          .firebaseMessaging
-          .unsubscribeFromTopic("d_${currentUser?.id}");
-      FirebaseService()
-          .firebaseMessaging
-          .unsubscribeFromTopic("${currentUser?.role}");
+      if (currentUser != null) {
+        FirebaseService()
+            .firebaseMessaging
+            .unsubscribeFromTopic("${currentUser?.id}");
+        FirebaseService()
+            .firebaseMessaging
+            .unsubscribeFromTopic("d_${currentUser?.id}");
+        FirebaseService()
+            .firebaseMessaging
+            .unsubscribeFromTopic("${currentUser?.role}");
+      }
     } catch (_) {}
+    currentUser = null;
+    driverVehicle = null;
   }
 
   //

@@ -9,6 +9,7 @@ import 'package:mahilasaarthi/views/pages/permission/widgets/request_overlay_per
 import 'package:mahilasaarthi/views/pages/shared/home.page.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:mahilasaarthi/services/location.service.dart';
 import 'base.view_model.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -24,9 +25,33 @@ class PermissionViewModel extends MyBaseViewModel {
   bool bgPermissionGranted = false;
   bool overlayPermissionGranted = false;
 
+  double? currentLat;
+  double? currentLng;
+  bool isFetchingLocation = false;
+
+  Future<void> fetchCurrentLocation() async {
+    isFetchingLocation = true;
+    notifyListeners();
+    try {
+      await LocationService().prepareLocationListener();
+      final loc = LocationService().currentLocation;
+      if (loc != null) {
+        currentLat = loc.latitude;
+        currentLng = loc.longitude;
+      }
+    } catch (e) {
+      print("Error fetching location on permission page: $e");
+    }
+    isFetchingLocation = false;
+    notifyListeners();
+  }
+
   void initialise() async {
     //
     await fetchAllNeededPermissions();
+    if (locationPermissionGranted) {
+      fetchCurrentLocation();
+    }
   }
 
   fetchAllNeededPermissions() async {
@@ -139,6 +164,8 @@ class PermissionViewModel extends MyBaseViewModel {
   handleLocationPermission() async {
     PermissionStatus status = await Permission.location.request();
     if (status.isGranted) {
+      locationPermissionGranted = true;
+      await fetchCurrentLocation();
       nextStep();
       notifyListeners();
     } else {
@@ -155,6 +182,7 @@ class PermissionViewModel extends MyBaseViewModel {
   handleBackgroundLocationPermission() async {
     PermissionStatus status = await Permission.locationAlways.request();
     if (status.isGranted) {
+      LocationService().prepareLocationListener();
       nextStep();
       notifyListeners();
     } else {
@@ -221,9 +249,29 @@ class PermissionViewModel extends MyBaseViewModel {
     notifyListeners();
   }
 
-  loadHomepage() {
-    viewContext.nextAndRemoveUntilPage(
-      HomePage(),
-    );
+  loadHomepage() async {
+    bool allGranted = await checkAllPermissionsGranted();
+    if (Navigator.canPop(viewContext)) {
+      Navigator.pop(viewContext, allGranted);
+    } else {
+      Navigator.pushAndRemoveUntil(
+        viewContext,
+        MaterialPageRoute(builder: (context) =>  HomePage()),
+        (route) => false,
+      );
+    }
+  }
+
+  Future<bool> checkAllPermissionsGranted() async {
+    bool loc = await isLocationPermissionGranted();
+    bool bgLoc = await isBgLocationPermissionGranted();
+    bool bg = await isBgPermissionGranted();
+    bool overlay = await isOverlayPermissionGranted();
+
+    if (Platform.isAndroid) {
+      return loc && bgLoc && bg && overlay;
+    } else {
+      return loc && bgLoc;
+    }
   }
 }

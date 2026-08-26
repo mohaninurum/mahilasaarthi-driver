@@ -61,7 +61,7 @@ class _RegisterPageState extends State<RegisterPage> {
           isLoading: vm.isBusy,
           body: FormBuilder(
             key: vm.formBuilderKey,
-            autoFocusOnValidationFailure: true,
+            autoFocusOnValidationFailure: false,
             child: VStack(
               [
                 SafeArea(
@@ -404,11 +404,11 @@ class _RegisterPageState extends State<RegisterPage> {
                         CustomButton(
                           title: "Sign Up".tr(),
                           loading: vm.isBusy,
-                          onPressed: (){
-                            if(vm.selfieImage != null){
+                          onPressed: () {
+                            if (vm.selfieImage != null) {
                               vm.processRegister();
-                            }else{
-                              Fluttertoast.showToast(msg:"Please take a photo.");
+                            } else {
+                              vm.toastError("Please take a profile photo.".tr());
                             }
                           },
                         ).centered().py20(),

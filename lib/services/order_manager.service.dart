@@ -176,47 +176,52 @@ class OrderManagerService {
   monitorOnlineStatusListener({
     AppService? appService,
   }) async {
-    //
-    final driverId = (await AuthServices.getCurrentUser()).id.toString();
-    final driverDoc =
-        await firebaseFireStore.collection("drivers").doc(driverId).get();
+    try {
+      final currentUser = await AuthServices.getCurrentUser();
+      if (currentUser == null) return;
+      final driverId = currentUser.id.toString();
+      final driverDoc =
+          await firebaseFireStore.collection("drivers").doc(driverId).get();
 
-    bool shouldGoOffline = false;
-    //if exists
-    if (driverDoc.exists) {
-      //
-      if (driverDoc.data() != null &&
-          (!driverDoc.data()!.containsKey("online") ||
-              !driverDoc.data()!.containsKey("free"))) {
-        //forcefully update doc value
-        await driverDoc.reference.update(
+      bool shouldGoOffline = false;
+      //if exists
+      if (driverDoc.exists) {
+        //
+        if (driverDoc.data() != null &&
+            (!driverDoc.data()!.containsKey("online") ||
+                !driverDoc.data()!.containsKey("free"))) {
+          //forcefully update doc value
+          await driverDoc.reference.update(
+            {
+              "online": driverDoc.data()!.containsKey("online")
+                  ? driverDoc.get("online")
+                  : 1,
+              "free": driverDoc.data()!.containsKey("free")
+                  ? driverDoc.get("free")
+                  : 1,
+            },
+          );
+        }
+      } else {
+        shouldGoOffline = true;
+        await driverDoc.reference.set(
           {
-            "online": driverDoc.data()!.containsKey("online")
-                ? driverDoc.get("online")
-                : 1,
-            "free": driverDoc.data()!.containsKey("free")
-                ? driverDoc.get("free")
-                : 1,
+            "online": AppService().driverIsOnline ? 1 : 0,
+            "free": 1,
           },
         );
       }
-    } else {
-      shouldGoOffline = true;
-      await driverDoc.reference.set(
-        {
-          "online": AppService().driverIsOnline ? 1 : 0,
-          "free": 1,
-        },
-      );
-    }
-    //set the status to the backend
-    if (shouldGoOffline) {
-      await LocalStorageService.prefs!.setBool(AppStrings.onlineOnApp, false);
-      if (appService != null) {
-        appService.driverIsOnline = false;
-      } else {
-        AppService().driverIsOnline = false;
+      //set the status to the backend
+      if (shouldGoOffline) {
+        await LocalStorageService.prefs!.setBool(AppStrings.onlineOnApp, false);
+        if (appService != null) {
+          appService.driverIsOnline = false;
+        } else {
+          AppService().driverIsOnline = false;
+        }
       }
+    } catch (error) {
+      print("monitorOnlineStatusListener error: $error");
     }
   }
 
@@ -238,19 +243,24 @@ class OrderManagerService {
 
   //This is delete exipred driver_new_order data
   void clearDriverNewOrderListener() async {
-    //
-    final driverId = (await AuthServices.getCurrentUser()).id.toString();
-    final driverNewOrderData = await firebaseFireStore
-        .collection("driver_new_order")
-        .doc(driverId)
-        .get();
-
-    //
-    if (driverNewOrderData.exists) {
-      await firebaseFireStore
+    try {
+      final currentUser = await AuthServices.getCurrentUser();
+      if (currentUser == null) return;
+      final driverId = currentUser.id.toString();
+      final driverNewOrderData = await firebaseFireStore
           .collection("driver_new_order")
           .doc(driverId)
-          .delete();
+          .get();
+
+      //
+      if (driverNewOrderData.exists) {
+        await firebaseFireStore
+            .collection("driver_new_order")
+            .doc(driverId)
+            .delete();
+      }
+    } catch (error) {
+      print("clearDriverNewOrderListener error: $error");
     }
   }
 }

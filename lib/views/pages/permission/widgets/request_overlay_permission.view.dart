@@ -67,7 +67,7 @@ class _RequestOverlayPermissionViewState
             ),
 
             UiSpacer.vSpace(),
-            "We need to draw over other apps on your device. This will allow us to offer features such as floating widgets, pop-up notifications, and other interactive elements."
+            "This permission enables floating widgets and pop-up ride notifications over other apps so you never miss an incoming trip request while navigating or using other apps."
                 .tr()
                 .text
                 .wordSpacing(2)
@@ -88,7 +88,7 @@ class _RequestOverlayPermissionViewState
         Visibility(
           visible: !Platform.isIOS,
           child: CustomTextButton(
-            title: "Skip".tr(),
+            title: "Not Now".tr(),
             onPressed: widget.vm.nextStep,
           ).wFull(context),
         ),
