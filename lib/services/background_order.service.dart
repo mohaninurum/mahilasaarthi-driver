@@ -93,7 +93,6 @@ class BackgroundOrderService extends ExtendedOrderService {
         },
         notificationLayout: NotificationLayout.BigText,
         category: NotificationCategory.Transport,
-        criticalAlert: true,
       ),
       actionButtons: [
         NotificationActionButton(

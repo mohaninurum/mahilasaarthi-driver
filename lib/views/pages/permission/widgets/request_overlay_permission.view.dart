@@ -7,7 +7,7 @@ import 'package:mahilasaarthi/view_models/permission.vm.dart';
 import 'package:mahilasaarthi/widgets/buttons/custom_button.dart';
 import 'package:mahilasaarthi/widgets/buttons/custom_text_button.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class RequestOverlayPermissionView extends StatefulWidget {

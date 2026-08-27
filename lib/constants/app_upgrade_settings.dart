@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:mahilasaarthi/constants/app_strings.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class AppUpgradeSettings extends AppStrings {
   static Future<bool> showUpgrade() async {

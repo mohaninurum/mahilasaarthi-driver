@@ -66,7 +66,7 @@ class HttpService {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final userToken = await AuthServices.getAuthBearerToken();
+          final skipAuth = options.extra["skipAuth"] == true;
           String langCode = "en";
           try {
             langCode = translator.activeLocale.languageCode;
@@ -75,8 +75,14 @@ class HttpService {
           }
           options.headers[HttpHeaders.acceptHeader] = "application/json";
           options.headers["lang"] = langCode;
-          if (userToken.isNotEmpty) {
-            options.headers[HttpHeaders.authorizationHeader] = "Bearer $userToken";
+          if (!skipAuth) {
+            final userToken = await AuthServices.getAuthBearerToken();
+            if (userToken.isNotEmpty) {
+              options.headers[HttpHeaders.authorizationHeader] =
+                  "Bearer $userToken";
+            }
+          } else {
+            options.headers.remove(HttpHeaders.authorizationHeader);
           }
           try {
             List<String> curlParts = ["curl -X ${options.method.toUpperCase()}"];
@@ -122,23 +128,45 @@ class HttpService {
           if (response.statusCode == 401) {
             try {
               final path = response.requestOptions.path;
-              bool isAuthEndpoint = path.contains('/login') ||
+              final skipAuth = response.requestOptions.extra["skipAuth"] == true;
+              // Public/bootstrap + auth flows must never wipe the session.
+              final isPublicOrAuthEndpoint = skipAuth ||
+                  path.contains('/app/settings') ||
+                  path.contains('/app/emergency') ||
+                  path.contains('/app/onboarding') ||
+                  path.contains('/app/faqs') ||
+                  path.contains('/login') ||
                   path.contains('/otp/') ||
                   path.contains('/register') ||
-                  path.contains('/verify');
-              
-              if (!isAuthEndpoint) {
+                  path.contains('/verify') ||
+                  path.contains('/password/');
+
+              // Only force logout when a clearly session-bound profile call fails.
+              // Periodic/order/location 401s after idle must not kick the driver out.
+              final isSessionCheckEndpoint = path.contains('/my/profile') ||
+                  path.contains('/profile/update') ||
+                  path.contains('/logout');
+
+              if (!isPublicOrAuthEndpoint && isSessionCheckEndpoint) {
                 final token = await AuthServices.getAuthBearerToken();
                 if (token.isNotEmpty) {
-                  print("401 Unauthorized for path $path with active token. Logging out user...");
+                  print(
+                      "401 Unauthorized for session path $path. Logging out user...");
                   await AuthServices.logout();
-                  AppService().navigatorKey.currentState?.pushNamedAndRemoveUntil(
+                  AppService()
+                      .navigatorKey
+                      .currentState
+                      ?.pushNamedAndRemoveUntil(
                         AppRoutes.welcomeRoute,
                         (route) => false,
                       );
                 } else {
-                  print("401 Unauthorized for path $path but token is empty. Skipping auto-logout redirect.");
+                  print(
+                      "401 Unauthorized for path $path but token is empty. Skipping auto-logout redirect.");
                 }
+              } else {
+                print(
+                    "401 on path $path — keeping local session (not a session-check endpoint).");
               }
             } catch (error) {
               print("Logout error on 401: $error");
@@ -179,15 +207,17 @@ class HttpService {
     String url, {
     Map<String, dynamic>? queryParameters,
     bool includeHeaders = true,
+    bool skipAuth = false,
   }) async {
     //preparing the api uri/url
     String uri = "$host$url";
 
     //preparing the post options if header is required
     final mOptions = !includeHeaders
-        ? null
+        ? Options(extra: {"skipAuth": skipAuth})
         : Options(
             headers: await getHeaders(),
+            extra: {"skipAuth": skipAuth},
           );
 
     Response response;

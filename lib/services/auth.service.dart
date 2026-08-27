@@ -30,6 +30,20 @@ class AuthServices {
     return isAuth && token.isNotEmpty;
   }
 
+  /// Prefer this on cold start so prefs are loaded from disk before routing.
+  static Future<bool> authenticatedAsync() async {
+    final prefs = await LocalStorageService.getPrefs();
+    try {
+      await prefs?.reload();
+    } catch (_) {}
+    final isAuth = prefs?.getBool(AppStrings.authenticated) ?? false;
+    final token = prefs?.getString(AppStrings.userAuthToken) ?? "";
+    if (token.isNotEmpty) {
+      _authToken = token;
+    }
+    return isAuth && token.isNotEmpty;
+  }
+
   static Future<bool> isAuthenticated() async {
     final prefs = await LocalStorageService.getPrefs();
     return await prefs?.setBool(AppStrings.authenticated, true) ?? false;
@@ -192,7 +206,11 @@ class AuthServices {
     } catch (_) {}
     try {
       final prefs = await LocalStorageService.getPrefs();
-      await prefs?.clear();
+      // Clear auth session only — do not wipe language/settings/theme.
+      await prefs?.remove(AppStrings.authenticated);
+      await prefs?.remove(AppStrings.userAuthToken);
+      await prefs?.remove(AppStrings.userKey);
+      await prefs?.remove(AppStrings.driverVehicleKey);
       await prefs?.setBool(AppStrings.firstTimeOnApp, false);
     } catch (_) {}
     try {

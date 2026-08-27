@@ -9,19 +9,21 @@ import 'package:localize_and_translate/localize_and_translate.dart';
 class SettingsRequest extends HttpService {
   //
   Future<ApiResponse> appSettings() async {
-    final apiResult = await get(Api.appSettings);
+    // Public bootstrap endpoint — never send bearer token (expired tokens
+    // cause 401 and were wiping the local login session on cold start).
+    final apiResult = await get(Api.appSettings, skipAuth: true);
     log("APP SETING : " + apiResult.data.toString());
     return ApiResponse.fromResponse(apiResult);
   }
 
   Future<ApiResponse> emergencyContacts() async {
-    final apiResult = await get(Api.emergencyContacts);
+    final apiResult = await get(Api.emergencyContacts, skipAuth: true);
     return ApiResponse.fromResponse(apiResult);
   }
 
   Future<ApiResponse> appOnboardings() async {
     try {
-      final apiResult = await get(Api.appOnboardings);
+      final apiResult = await get(Api.appOnboardings, skipAuth: true);
       return ApiResponse.fromResponse(apiResult);
     } on DioError catch (error) {
       if (error.type == DioErrorType.other) {

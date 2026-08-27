@@ -16,7 +16,7 @@ import 'package:mahilasaarthi/services/auth.service.dart';
 import 'package:mahilasaarthi/view_models/base.view_model.dart';
 import 'package:mahilasaarthi/widgets/cards/language_selector.view.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:velocity_x/velocity_x.dart';
 

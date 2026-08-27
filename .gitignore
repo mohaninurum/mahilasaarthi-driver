@@ -6,3 +6,4 @@ build/
 
 # FVM Version Cache
 .fvm/
+*.log

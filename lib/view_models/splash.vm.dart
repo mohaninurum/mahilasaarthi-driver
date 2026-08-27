@@ -152,9 +152,9 @@ class SplashViewModel extends MyBaseViewModel {
       print("Error opening language selector: $e");
     }
 
-    final targetRoute = !AuthServices.authenticated()
-        ? AppRoutes.welcomeRoute
-        : AppRoutes.homeRoute;
+    final isLoggedIn = await AuthServices.authenticatedAsync();
+    final targetRoute =
+        !isLoggedIn ? AppRoutes.welcomeRoute : AppRoutes.homeRoute;
 
     try {
       if (AppService().navigatorKey.currentState != null) {
